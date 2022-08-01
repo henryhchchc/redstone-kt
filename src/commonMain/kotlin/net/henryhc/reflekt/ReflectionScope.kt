@@ -18,7 +18,7 @@ class ReflectionScope {
         ObjectType.also { this[it.name] = it }
     }.toMutableMap()
 
-    val knownTypes: Map<String, Type> = object : Map<String, Type> by typeMap {}
+    val knownTypes: Map<String, Type> = typeMap
 
     fun resolveNewTypes(block: ResolutionContext.() -> Unit) = ResolutionContext(this, block).resolve()
 
@@ -29,7 +29,7 @@ class ReflectionScope {
 
         private val danglingTypeReferences = mutableMapOf<FlexibleTypeReference, String>()
 
-        val typesInScope = object : Map<String, Type> by scope.typeMap {}
+        val typesInScope get() = scope.typeMap
 
         val newlyResolvedTypes = mutableMapOf<String, Type>()
 
