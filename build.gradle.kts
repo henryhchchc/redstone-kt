@@ -41,7 +41,7 @@ kotlin {
     val nativeTarget = when (hostOs) {
         "Mac OS X" -> when (arch) {
             "aarch64" -> macosArm64(nativeTargetName)
-            "amd64" -> macosX64(nativeTargetName)
+            "x86_64" -> macosX64(nativeTargetName)
             else -> throw GradleException("Architecture $arch is not supported on macOS")
         }
 
