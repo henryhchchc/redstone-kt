@@ -1,11 +1,10 @@
 package net.henryhc.reflekt
 
+import arrow.core.toOption
+import net.henryhc.reflekt.elements.GenericDeclaration
 import net.henryhc.reflekt.elements.references.FlexibleTypeReference
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.types.ObjectType
-import net.henryhc.reflekt.elements.types.Type
-import net.henryhc.reflekt.elements.types.TypeVariable
-import net.henryhc.reflekt.elements.types.knownPrimitiveTypes
+import net.henryhc.reflekt.elements.types.*
 
 
 class ReflectionScope {
@@ -20,7 +19,14 @@ class ReflectionScope {
 
     val knownTypes: Map<String, Type> = typeMap
 
-    fun resolveNewTypes(block: ResolutionContext.() -> Unit) = ResolutionContext(this, block).resolve()
+    operator fun contains(qualifiedName: String) = knownTypes.contains(qualifiedName)
+
+    fun getTypeByName(qualifiedName: String) = (knownTypes[qualifiedName] as? GenericType).toOption()
+
+    fun getTypeVariable(typeName: String, variableName: String) =
+        (knownTypes["$typeName->$variableName"] as? TypeVariable).toOption()
+
+    internal fun resolveNewTypes(block: ResolutionContext.() -> Unit) = ResolutionContext(this, block).resolve()
 
     class ResolutionContext(
         private val scope: ReflectionScope,

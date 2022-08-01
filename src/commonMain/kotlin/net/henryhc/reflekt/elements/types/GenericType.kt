@@ -17,7 +17,7 @@ open class GenericType(
     val modifiers: AccessModifiers = ACC_PUBLIC,
     override val typeParameters: List<TypeVariable> = emptyList(),
     val superType: TypeReference? = ObjectTypeReference,
-    val implementedInterfaces: Iterable<TypeReference> = emptyList(),
+    val implementedInterfaces: List<TypeReference> = emptyList(),
 ) : ReferenceType, GenericDeclaration {
 
     override fun toString(): String = buildString {
