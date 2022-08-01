@@ -25,8 +25,7 @@ kotlin {
         compilations.all {
             kotlinOptions {
                 jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs + "-Xjdk-release=11"
-                freeCompilerArgs = freeCompilerArgs + "-Xbackend-threads=0"
+                freeCompilerArgs = freeCompilerArgs + listOf("-Xjdk-release=11", "-Xbackend-threads=0")
             }
         }
         withJava()
