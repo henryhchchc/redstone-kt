@@ -7,7 +7,7 @@ import net.henryhc.reflekt.elements.types.Type
  * @property type The type referring to.
  * @property materialization Known mapping from the type variables to the actual types.
  */
-sealed interface TypeReference {
+interface TypeReference {
     val type: Type
     val materialization: Materialization
 }

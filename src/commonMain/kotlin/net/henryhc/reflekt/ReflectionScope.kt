@@ -4,9 +4,12 @@ import arrow.core.*
 import net.henryhc.reflekt.elements.members.Constructor
 import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Method
-import net.henryhc.reflekt.elements.references.FlexibleTypeReference
+import net.henryhc.reflekt.elements.references.DanglingTypeReference
 import net.henryhc.reflekt.elements.references.Materialization
-import net.henryhc.reflekt.elements.types.*
+import net.henryhc.reflekt.elements.types.PrimitiveType
+import net.henryhc.reflekt.elements.types.ReferenceType
+import net.henryhc.reflekt.elements.types.Type
+import net.henryhc.reflekt.elements.types.TypeVariable
 
 
 /**
@@ -15,7 +18,7 @@ import net.henryhc.reflekt.elements.types.*
 class ReflectionScope {
 
     private val typeMap: MutableMap<String, Type> = buildMap {
-        knownPrimitiveTypes.forEach { this[it.name] = it }
+        PrimitiveType.ALL.forEach { this[it.name] = it }
     }.toMutableMap()
 
     private val methods: MutableMap<ReferenceType, Set<Method>> = mutableMapOf()
@@ -71,7 +74,7 @@ class ReflectionScope {
         private val block: ResolutionContext.() -> Unit
     ) {
 
-        private val danglingTypeReferences = mutableMapOf<FlexibleTypeReference, String>()
+        private val danglingTypeReferences = mutableMapOf<DanglingTypeReference, String>()
         private val typesInScope get() = scope.typeMap
 
         val newlyResolvedTypeVariablesForReferenceTypes = mutableMapOf<String, TypeVariable<ReferenceType>>()
@@ -99,13 +102,13 @@ class ReflectionScope {
             scope.getTypeByName(qualifiedName).getOrElse { newlyResolvedTypes.getValue(qualifiedName) }
 
         fun newTypeReference(qualifiedName: String, materialization: Materialization = Materialization.EMPTY) =
-            FlexibleTypeReference(materialization).also { danglingTypeReferences[it] = qualifiedName }
+            DanglingTypeReference(materialization).also { danglingTypeReferences[it] = qualifiedName }
 
         fun newTypeVariableReference(typeName: String, varName: String) =
-            FlexibleTypeReference().also { it.bind(findResolvedTypeVariable(typeName, varName)) }
+            findResolvedTypeVariable(typeName, varName).makeReference()
 
         fun newTypeVariableReference(typeName: String, methodSig: String, varName: String) =
-            FlexibleTypeReference().also { it.bind(findResolvedTypeVariable(typeName, methodSig, varName)) }
+            findResolvedTypeVariable(typeName, methodSig, varName).makeReference()
 
         fun resolve() {
             this.block()

@@ -6,7 +6,7 @@ import net.henryhc.reflekt.elements.types.Type
 /**
  * An implementation of [TypeReference] that can be bind later, which is useful for handling circular dependencies.
  */
-class FlexibleTypeReference(
+class DanglingTypeReference(
     override val materialization: Materialization = Materialization.EMPTY
 ) : TypeReference {
 

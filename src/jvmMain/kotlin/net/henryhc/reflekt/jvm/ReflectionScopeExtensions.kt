@@ -6,7 +6,7 @@ import net.henryhc.reflekt.elements.members.Constructor
 import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Member
 import net.henryhc.reflekt.elements.members.Method
-import net.henryhc.reflekt.elements.references.FlexibleTypeReference
+import net.henryhc.reflekt.elements.references.DanglingTypeReference
 import net.henryhc.reflekt.elements.references.Materialization
 import net.henryhc.reflekt.elements.references.TypeReference
 import net.henryhc.reflekt.elements.references.WildcardTypeReference
@@ -54,8 +54,8 @@ fun ReflectionScope.addClass(jvmClass: JvmClass) = resolveNewTypes {
 private fun ReflectionScope.ResolutionContext.makeReference(jvmType: JvmType): TypeReference = when {
     jvmType is JvmParameterizedType -> newTypeReference(jvmType.qualifiedTypeName, generateMaterialization(jvmType))
     jvmType is JvmClass && !jvmType.isArray -> newTypeReference(jvmType.qualifiedTypeName)
-    jvmType is JvmClass && jvmType.isArray -> FlexibleTypeReference().also { it.bind(ArrayType(makeReference(jvmType.componentType))) }
-    jvmType is JvmGenericArrayType -> FlexibleTypeReference().also { it.bind(ArrayType(makeReference(jvmType.genericComponentType))) }
+    jvmType is JvmClass && jvmType.isArray -> DanglingTypeReference().also { it.bind(ArrayType(makeReference(jvmType.componentType))) }
+    jvmType is JvmGenericArrayType -> DanglingTypeReference().also { it.bind(ArrayType(makeReference(jvmType.genericComponentType))) }
 
     jvmType is JvmTypeVariable && jvmType.genericDeclaration is JvmClass -> newTypeVariableReference(
         (jvmType.genericDeclaration as JvmClass).qualifiedTypeName,

@@ -14,7 +14,7 @@ value class Materialization(private val rawMapping: Map<TypeVariable<*>, TypeRef
         /**
          * Denotes an empty [Materialization].
          */
-        val EMPTY = Materialization(emptyMap())
+        val EMPTY: Materialization = Materialization(emptyMap())
     }
 }
 
