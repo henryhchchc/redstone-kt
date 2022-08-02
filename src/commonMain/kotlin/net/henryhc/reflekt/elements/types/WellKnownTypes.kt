@@ -5,7 +5,7 @@ package net.henryhc.reflekt.elements.types
 val knownPrimitiveTypes =
     setOf(VoidType, BooleanType, ByteType, CharType, DoubleType, FloatType, IntType, LongType, ShortType)
 
-object ObjectType : GenericType("java.lang.Object", superType = null)
+object ObjectType : ReferenceType("java.lang.Object", superType = null)
 
 object VoidType : PrimitiveType("void", BoxedVoidType)
 

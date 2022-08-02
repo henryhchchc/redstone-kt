@@ -2,7 +2,7 @@ package net.henryhc.reflekt.elements.members
 
 import net.henryhc.reflekt.AccessModifiers
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.types.GenericType
+import net.henryhc.reflekt.elements.types.ReferenceType
 
 /**
  * Denotes a JVM field.
@@ -13,5 +13,5 @@ class Field(
     val name: String,
     val type: TypeReference,
     override val modifiers: AccessModifiers,
-    override val declaration: GenericType
+    override val declaration: ReferenceType
 ) : Member

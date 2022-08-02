@@ -2,7 +2,6 @@ package net.henryhc.reflekt.elements.references
 
 import net.henryhc.reflekt.elements.types.ObjectType
 import net.henryhc.reflekt.elements.types.Type
-import net.henryhc.reflekt.elements.types.TypeVariable
 
 
 /**
@@ -10,5 +9,7 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  */
 object ObjectTypeReference : TypeReference {
     override val type: Type = ObjectType
-    override val materialization: Map<TypeVariable, TypeReference> = emptyMap()
+    override val materialization: Materialization = Materialization.EMPTY
+
+    override fun toString(): String  = ObjectType.toString()
 }

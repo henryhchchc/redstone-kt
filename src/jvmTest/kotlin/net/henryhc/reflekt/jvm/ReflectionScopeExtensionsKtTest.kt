@@ -1,7 +1,7 @@
 package net.henryhc.reflekt.jvm
 
 import net.henryhc.reflekt.ReflectionScope
-import net.henryhc.reflekt.elements.types.GenericType
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.ObjectType
 import org.example.ComplicatedType
 import org.example.SimpleType
@@ -19,7 +19,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assert(jvmType.name in scope)
-        val type = scope.knownTypes.getValue(jvmType.name) as GenericType
+        val type = scope[jvmType.name] as ReferenceType
         assertNotNull(type.superType)
         assertEquals(ObjectType, type.superType?.type)
     }
@@ -34,13 +34,13 @@ internal class ReflectionScopeExtensionsTest {
         assert(complicatedType.name in scope)
         assert(simpleType.name in scope)
 
-        val complicatedGenericType = scope.knownTypes.getValue(complicatedType.name) as GenericType
-        val simpleGenericType = scope.knownTypes.getValue(simpleType.name) as GenericType
+        val complicatedReferenceType = scope[complicatedType.name] as ReferenceType
+        val simpleReferenceType = scope[simpleType.name] as ReferenceType
 
-        assertNotNull(complicatedGenericType.superType)
-        assertEquals(simpleGenericType, complicatedGenericType.superType?.type)
+        assertNotNull(complicatedReferenceType.superType)
+        assertEquals(simpleReferenceType, complicatedReferenceType.superType?.type)
 
-        assertEquals(2, complicatedGenericType.implementedInterfaces.size)
+        assertEquals(2, complicatedReferenceType.implementedInterfaces.size)
     }
 
 
@@ -52,7 +52,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assert(jvmType.name in scope)
-        val type = scope.knownTypes.getValue(jvmType.name) as GenericType
+        val type = scope[jvmType.name] as ReferenceType
         assertNotNull(type.superType)
         assertEquals(ObjectType, type.superType?.type)
     }

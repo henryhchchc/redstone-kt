@@ -12,18 +12,18 @@ import net.henryhc.reflekt.elements.references.TypeReference
 class TypeVariable(
     override val name: String,
     val upperBounds: List<TypeReference>
-) : ReferenceType {
+) : Type() {
 
     private lateinit var _declaration: GenericDeclaration
 
     var declaration
         get() = _declaration
         set(value) {
-            require(!this::_declaration.isInitialized)
-            _declaration = value
+            if (!this::_declaration.isInitialized)
+                _declaration = value
         }
 
-    override fun toString() = buildString {
+    override fun toString(): String = buildString {
         append(name)
         val displayedBounds = upperBounds.filterNot { it.type == ObjectType }
         if (displayedBounds.isNotEmpty()) {

@@ -21,6 +21,15 @@ typealias JvmTypeVariable = java.lang.reflect.TypeVariable<*>
  */
 typealias JvmParameterizedType = java.lang.reflect.ParameterizedType
 
+/**
+ * Denotes a wildcard type in JVM reflection APIs.
+ */
+typealias JvmWildcardType = java.lang.reflect.WildcardType
+
+/**
+ * Denotes a generic array type in JVM reflection APIs.
+ */
+typealias JvmGenericArrayType = java.lang.reflect.GenericArrayType
 
 /**
  * Denotes a method in JVM reflection APIs.
@@ -28,12 +37,11 @@ typealias JvmParameterizedType = java.lang.reflect.ParameterizedType
 typealias JvmMethod = java.lang.reflect.Method
 
 /**
- * Denotes a wildcard type in JVM reflection APIs.
+ * Denotes a constructor in JVM reflection APIs.
  */
-typealias JvmWildcardType = java.lang.reflect.WildcardType
-
+typealias JvmConstructor = java.lang.reflect.Constructor<*>
 
 /**
- * Denotes a generic array type in JVM reflection APIs.
+ * Denotes a field in JVM reflection APIs.
  */
-typealias JvmGenericArrayType = java.lang.reflect.GenericArrayType
+typealias JvmField = java.lang.reflect.Field
