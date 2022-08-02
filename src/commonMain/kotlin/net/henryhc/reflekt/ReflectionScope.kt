@@ -6,10 +6,7 @@ import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.DanglingTypeReference
 import net.henryhc.reflekt.elements.references.Materialization
-import net.henryhc.reflekt.elements.types.PrimitiveType
-import net.henryhc.reflekt.elements.types.ReferenceType
-import net.henryhc.reflekt.elements.types.Type
-import net.henryhc.reflekt.elements.types.TypeVariable
+import net.henryhc.reflekt.elements.types.*
 
 
 /**
@@ -19,6 +16,7 @@ class ReflectionScope {
 
     private val typeMap: MutableMap<String, Type> = buildMap {
         PrimitiveType.ALL.forEach { this[it.name] = it }
+//        this[ObjectType.name] = ObjectType
     }.toMutableMap()
 
     private val methods: MutableMap<ReferenceType, Set<Method>> = mutableMapOf()
@@ -32,19 +30,18 @@ class ReflectionScope {
     operator fun contains(qualifiedName: String): Boolean = typeMap.contains(qualifiedName)
 
     /**
-     * Gets a [ReferenceType] from the scope by type name.
+     * Gets a [Type] from the scope by type name.
      * @param qualifiedName The fully qualified type name.
-     * @return The [ReferenceType] if found, `null` otherwise.
+     * @return The [Type] if found, `null` otherwise.
      */
-    operator fun get(qualifiedName: String): ReferenceType? = getTypeByName(qualifiedName).getOrElse { null }
+    operator fun get(qualifiedName: String): Type? = getTypeByName(qualifiedName).getOrElse { null }
 
     /**
-     * Gets a [ReferenceType] from the scope by type name.
+     * Gets a [Type] from the scope by type name.
      * @param qualifiedName The fully qualified type name.
      * @return A [Some] if found, [None] otherwise.
      */
-    fun getTypeByName(qualifiedName: String): Option<ReferenceType> =
-        (typeMap[qualifiedName] as? ReferenceType).toOption()
+    fun getTypeByName(qualifiedName: String): Option<Type> = typeMap[qualifiedName].toOption()
 
     /**
      * Gets the set of methods of the given type.
@@ -75,7 +72,7 @@ class ReflectionScope {
     ) {
 
         private val danglingTypeReferences = mutableMapOf<DanglingTypeReference, String>()
-        private val typesInScope get() = scope.typeMap
+        val typesInScope get() = scope.typeMap
 
         val newlyResolvedTypeVariablesForReferenceTypes = mutableMapOf<String, TypeVariable<ReferenceType>>()
 
@@ -91,7 +88,7 @@ class ReflectionScope {
 
         fun findResolvedTypeVariable(typeName: String, varName: String) =
             if (typeName in scope || typeName in newlyResolvedTypes)
-                findResolvedType(typeName).typeParameters.single { it.name == varName }
+                (findResolvedType(typeName) as ReferenceType).typeParameters.single { it.name == varName }
             else
                 newlyResolvedTypeVariablesForReferenceTypes.getValue("$typeName->$varName")
 
