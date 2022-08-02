@@ -6,6 +6,6 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  * Denotes a declaration with type parameters.
  * @property typeParameters The type parameters at the declaration.
  */
-interface GenericDeclaration {
-    val typeParameters: List<TypeVariable>
+interface GenericDeclaration<D : GenericDeclaration<D>> {
+    val typeParameters: List<TypeVariable<D>>
 }

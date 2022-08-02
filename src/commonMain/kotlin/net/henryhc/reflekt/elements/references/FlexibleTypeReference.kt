@@ -1,14 +1,13 @@
 package net.henryhc.reflekt.elements.references
 
-import net.henryhc.reflekt.elements.types.GenericType
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.Type
-import net.henryhc.reflekt.elements.types.TypeVariable
 
 /**
  * An implementation of [TypeReference] that can be bind later, which is useful for handling circular dependencies.
  */
 class FlexibleTypeReference(
-    override val materialization: Map<TypeVariable, TypeReference>
+    override val materialization: Materialization = Materialization.EMPTY
 ) : TypeReference {
 
     override lateinit var type: Type
@@ -27,7 +26,7 @@ class FlexibleTypeReference(
         append(type.name)
         if (materialization.isNotEmpty()) {
             append('<')
-            append((type as GenericType).typeParameters.joinToString(",") { materialization[it].toString() })
+            append((type as ReferenceType).typeParameters.joinToString(",") { materialization[it].toString() })
             append('>')
         }
     }

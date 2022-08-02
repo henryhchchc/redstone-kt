@@ -25,8 +25,10 @@ kotlin {
         compilations.all {
             kotlinOptions {
                 jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs + "-Xjdk-release=11"
-                freeCompilerArgs = freeCompilerArgs + "-Xbackend-threads=0"
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-Xbackend-threads=0",
+                    "-Xextended-compiler-checks"
+                )
             }
         }
         withJava()
@@ -55,7 +57,11 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                implementation("io.arrow-kt:arrow-core:1.1.2")
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))

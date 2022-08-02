@@ -1,7 +1,6 @@
 package net.henryhc.reflekt.elements.references
 
 import net.henryhc.reflekt.elements.types.Type
-import net.henryhc.reflekt.elements.types.TypeVariable
 
 /**
  * Denotes a reference to a [Type].
@@ -10,5 +9,5 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  */
 sealed interface TypeReference {
     val type: Type
-    val materialization: Map<TypeVariable, TypeReference>
+    val materialization: Materialization
 }
