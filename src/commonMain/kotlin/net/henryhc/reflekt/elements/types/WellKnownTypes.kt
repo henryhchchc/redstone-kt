@@ -7,25 +7,14 @@ val knownPrimitiveTypes =
 
 object ObjectType : ReferenceType("java.lang.Object", superType = null)
 
-object VoidType : PrimitiveType("void", BoxedVoidType)
+object VoidType : PrimitiveType("void", "java.lang.Void")
 
-object BooleanType : PrimitiveType("boolean", BoxedBooleanType)
-object ByteType : PrimitiveType("byte", BoxedByteType)
-object CharType : PrimitiveType("char", BoxedCharType)
-object DoubleType : PrimitiveType("double", BoxedDoubleType)
-object FloatType : PrimitiveType("float", BoxedFloatType)
-object IntType : PrimitiveType("int", BoxedIntType)
-object LongType : PrimitiveType("long", BoxedLongType)
-object ShortType : PrimitiveType("short", BoxedShortType)
-
-object BoxedVoidType : BoxedPrimitiveType("java.lang.Void")
-
-object BoxedBooleanType : BoxedPrimitiveType("java.lang.Boolean")
-object BoxedByteType : BoxedPrimitiveType("java.lang.Byte")
-object BoxedCharType : BoxedPrimitiveType("java.lang.Character")
-object BoxedShortType : BoxedPrimitiveType("java.lang.Short")
-object BoxedIntType : BoxedPrimitiveType("java.lang.Integer")
-object BoxedLongType : BoxedPrimitiveType("java.lang.Long")
-object BoxedFloatType : BoxedPrimitiveType("java.lang.Float")
-object BoxedDoubleType : BoxedPrimitiveType("java.lang.Double")
+object BooleanType : PrimitiveType("boolean", "java.lang.Boolean")
+object ByteType : PrimitiveType("byte", "java.lang.Byte")
+object CharType : PrimitiveType("char", "java.lang.Character")
+object DoubleType : PrimitiveType("double", "java.lang.Short")
+object FloatType : PrimitiveType("float", "java.lang.Integer")
+object IntType : PrimitiveType("int", "java.lang.Long")
+object LongType : PrimitiveType("long", "java.lang.Float")
+object ShortType : PrimitiveType("short", "java.lang.Double")
 

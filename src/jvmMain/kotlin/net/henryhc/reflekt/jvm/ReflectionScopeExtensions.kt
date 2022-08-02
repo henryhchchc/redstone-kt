@@ -10,10 +10,7 @@ import net.henryhc.reflekt.elements.references.FlexibleTypeReference
 import net.henryhc.reflekt.elements.references.Materialization
 import net.henryhc.reflekt.elements.references.TypeReference
 import net.henryhc.reflekt.elements.references.WildcardTypeReference
-import net.henryhc.reflekt.elements.types.ArrayType
-import net.henryhc.reflekt.elements.types.ReferenceType
-import net.henryhc.reflekt.elements.types.TypeVariable
-import net.henryhc.reflekt.elements.types.WildcardType
+import net.henryhc.reflekt.elements.types.*
 
 /**
  * Adds a JVM class to the reflection scope.
@@ -29,9 +26,17 @@ fun ReflectionScope.addClass(jvmClass: JvmClass) = resolveNewTypes {
         }.invoke(jvmClass)
     }
 
-    newJvmTypes.filterIsInstance<JvmTypeVariable>().associate {
-        it.qualifiedTypeName to TypeVariable(it.name, it.bounds.map { b -> newTypeReference(b.qualifiedTypeName) })
-    }.also(newlyResolvedTypes::putAll)
+    newJvmTypes.filterIsInstance<JvmTypeVariable>().filter { it.genericDeclaration is JvmType }.associate {
+        it.qualifiedTypeName to TypeVariable<ReferenceType>(
+            it.name,
+            it.bounds.map { b -> newTypeReference(b.qualifiedTypeName) })
+    }.also(newlyResolvedTypeVariablesForReferenceTypes::putAll)
+
+    newJvmTypes.filterIsInstance<JvmTypeVariable>().filter { it.genericDeclaration is JvmMethod }.associate {
+        it.qualifiedTypeName to TypeVariable<Method>(
+            it.name,
+            it.bounds.map { b -> newTypeReference(b.qualifiedTypeName) })
+    }.also(newlyResolvedTypeVariablesForMethods::putAll)
 
     newJvmTypes.filterIsInstance<JvmClass>().map { resolve(it) }.associateBy { it.name }
         .also(newlyResolvedTypes::putAll)
@@ -51,7 +56,18 @@ private fun ReflectionScope.ResolutionContext.makeReference(jvmType: JvmType): T
     jvmType is JvmClass && !jvmType.isArray -> newTypeReference(jvmType.qualifiedTypeName)
     jvmType is JvmClass && jvmType.isArray -> FlexibleTypeReference().also { it.bind(ArrayType(makeReference(jvmType.componentType))) }
     jvmType is JvmGenericArrayType -> FlexibleTypeReference().also { it.bind(ArrayType(makeReference(jvmType.genericComponentType))) }
-    jvmType is JvmTypeVariable -> newTypeReference(jvmType.qualifiedTypeName)
+
+    jvmType is JvmTypeVariable && jvmType.genericDeclaration is JvmClass -> newTypeVariableReference(
+        (jvmType.genericDeclaration as JvmClass).qualifiedTypeName,
+        jvmType.name
+    )
+
+    jvmType is JvmTypeVariable && jvmType.genericDeclaration is JvmMethod -> newTypeVariableReference(
+        (jvmType.genericDeclaration as JvmMethod).declaringClass.qualifiedTypeName,
+        (jvmType.genericDeclaration as JvmMethod).signature,
+        jvmType.name
+    )
+
     jvmType is JvmWildcardType -> WildcardTypeReference(resolve(jvmType))
     else -> throw NotImplementedError()
 }
@@ -61,7 +77,7 @@ private inline fun <reified T : Member> List<T>.groupByDeclaration() =
 
 private fun ReflectionScope.ResolutionContext.generateMaterialization(jvmType: JvmParameterizedType) =
     Materialization(jvmType.run { (rawType as JvmClass).typeParameters.zip(actualTypeArguments) }.associate { (t, a) ->
-        findResolvedTypeVariable(t.qualifiedTypeName) to makeReference(a)
+        findResolvedTypeVariable(jvmType.qualifiedTypeName, t.name) to makeReference(a)
     })
 
 private fun ReflectionScope.ResolutionContext.resolve(jvmType: JvmWildcardType) =
@@ -72,37 +88,44 @@ private fun ReflectionScope.ResolutionContext.resolve(f: JvmField) = Field(
     name = f.name,
     type = makeReference(f.genericType),
     modifiers = AccessModifiers(f.modifiers),
-    declaration = findResolvedType(f.declaringClass.qualifiedTypeName) as ReferenceType
+    declaration = findResolvedType(f.declaringClass.qualifiedTypeName)
 )
 
 private fun ReflectionScope.ResolutionContext.resolve(method: JvmMethod): Method {
-    val typeParams = method.typeParameters.map { findResolvedTypeVariable(it.qualifiedTypeName) }
+    val typeParams = method.typeParameters.map {
+        findResolvedTypeVariable(
+            method.declaringClass.qualifiedTypeName,
+            method.signature,
+            it.name
+        )
+    }
     return Method(
         name = method.name,
         returnType = makeReference(method.genericReturnType),
         modifiers = AccessModifiers(method.modifiers),
-        declaration = findResolvedType(method.declaringClass.qualifiedTypeName) as ReferenceType,
+        declaration = findResolvedType(method.declaringClass.qualifiedTypeName),
         parameterTypes = method.genericParameterTypes.map { makeReference(it) },
         typeParameters = typeParams
     ).also { gm -> typeParams.forEach { it.declaration = gm } }
 }
 
-private fun ReflectionScope.ResolutionContext.resolve(constructor: JvmConstructor) =
-    Constructor(modifiers = AccessModifiers(constructor.modifiers),
-        declaration = findResolvedType(constructor.declaringClass.qualifiedTypeName) as ReferenceType,
-        parameterTypes = constructor.genericParameterTypes.map { makeReference(it) })
+private fun ReflectionScope.ResolutionContext.resolve(constructor: JvmConstructor) = Constructor(
+    modifiers = AccessModifiers(constructor.modifiers),
+    declaration = findResolvedType(constructor.declaringClass.qualifiedTypeName),
+    parameterTypes = constructor.genericParameterTypes.map { makeReference(it) }
+)
 
 private fun ReflectionScope.ResolutionContext.resolve(jvmClass: JvmClass): ReferenceType {
-    val typeParams = jvmClass.typeParameters.map { findResolvedTypeVariable(it.qualifiedTypeName) }
-    return ReferenceType(name = jvmClass.typeName,
+    if (jvmClass.name == "java.lang.Object")
+        return ObjectType
+    val typeParams = jvmClass.typeParameters.map { findResolvedTypeVariable(jvmClass.qualifiedTypeName, it.name) }
+    return ReferenceType(
+        name = jvmClass.typeName,
         modifiers = AccessModifiers(jvmClass.modifiers),
         typeParameters = typeParams,
         superType = (jvmClass.genericSuperclass ?: jvmClass.superclass)?.let { makeReference(it) },
-        implementedInterfaces = jvmClass.genericInterfaces.map { makeReference(it) }).also { gt ->
-        typeParams.forEach {
-            it.declaration = gt
-        }
-    }
+        implementedInterfaces = jvmClass.genericInterfaces.map { makeReference(it) })
+        .also { gt -> typeParams.forEach { it.declaration = gt } }
 }
 
 private val JvmType.dependencies: List<JvmType>
@@ -142,16 +165,14 @@ private val JvmType.qualifiedTypeName: String
         this is JvmClass -> typeName
         this is JvmParameterizedType -> rawType.qualifiedTypeName
         this is JvmTypeVariable && this.genericDeclaration is JvmType -> "${(genericDeclaration as JvmType).typeName}->$name"
-        this is JvmTypeVariable && this.genericDeclaration is JvmMethod -> "${(genericDeclaration as JvmMethod).qualifiedName}->$name"
+        this is JvmTypeVariable && this.genericDeclaration is JvmMethod -> "${(genericDeclaration as JvmMethod).declaringClass.qualifiedTypeName}::${(genericDeclaration as JvmMethod).signature}->$name"
         this is JvmGenericArrayType -> "${genericComponentType.qualifiedTypeName}[]"
         this is JvmWildcardType -> "?"
         else -> throw NotImplementedError()
     }
 
-private val JvmMethod.qualifiedName
+private val JvmMethod.signature
     get() = buildString {
-        append(declaringClass.qualifiedTypeName)
-        append("::")
         append(name)
         append('(')
         append(parameterTypes.joinToString(",") { it.qualifiedTypeName })

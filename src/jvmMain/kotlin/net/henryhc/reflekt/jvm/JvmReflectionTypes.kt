@@ -45,3 +45,8 @@ typealias JvmConstructor = java.lang.reflect.Constructor<*>
  * Denotes a field in JVM reflection APIs.
  */
 typealias JvmField = java.lang.reflect.Field
+
+/**
+ * Denotes a generic declaration in JVM reflection APIs.
+ */
+typealias JvmGenericDeclaration = java.lang.reflect.GenericDeclaration

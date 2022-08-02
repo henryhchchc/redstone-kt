@@ -1,6 +1,5 @@
 package net.henryhc.reflekt.elements.types
 
-import net.henryhc.reflekt.elements.references.ObjectTypeReference
 import net.henryhc.reflekt.elements.references.TypeReference
 
 /**
@@ -16,10 +15,11 @@ class WildcardType(
     override val name: String get() = toString()
 
 
-    private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single() == ObjectTypeReference
+    private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single().type == ObjectType
+
     override fun toString() = buildString {
         append('?')
-        if (upperBounds.isNotEmpty() && !isImplicitUpperbound()){
+        if (upperBounds.isNotEmpty() && !isImplicitUpperbound()) {
             append(" extends ")
             append(upperBounds.joinToString(", "))
         }

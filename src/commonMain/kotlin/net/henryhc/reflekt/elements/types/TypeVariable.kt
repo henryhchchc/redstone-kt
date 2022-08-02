@@ -4,19 +4,19 @@ import net.henryhc.reflekt.elements.GenericDeclaration
 import net.henryhc.reflekt.elements.references.TypeReference
 
 /**
- * Denotes a type variable in [GenericDeclaration].
+ * Denotes a type variable in [D].
  * @property name The name of the type variable.
  * @property declaration The declaration the type variable belongs to.
  * @property upperBounds The upperbounds of the type variable.
  */
-class TypeVariable(
+class TypeVariable<D : GenericDeclaration<D>>(
     override val name: String,
     val upperBounds: List<TypeReference>
 ) : Type() {
 
-    private lateinit var _declaration: GenericDeclaration
+    private lateinit var _declaration: D
 
-    var declaration
+    var declaration: D
         get() = _declaration
         set(value) {
             if (!this::_declaration.isInitialized)

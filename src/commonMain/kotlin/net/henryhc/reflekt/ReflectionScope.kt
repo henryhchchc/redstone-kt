@@ -1,38 +1,68 @@
 package net.henryhc.reflekt
 
-import arrow.core.getOrElse
-import arrow.core.toOption
+import arrow.core.*
 import net.henryhc.reflekt.elements.members.Constructor
 import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.FlexibleTypeReference
 import net.henryhc.reflekt.elements.references.Materialization
-import net.henryhc.reflekt.elements.references.ObjectTypeReference
 import net.henryhc.reflekt.elements.types.*
 
 
+/**
+ * Denotes a reflection scope.
+ */
 class ReflectionScope {
 
     private val typeMap: MutableMap<String, Type> = buildMap {
-        knownPrimitiveTypes.forEach {
-            this[it.name] = it
-            this[it.boxedType.name] = it.boxedType
-        }
-        ObjectType.also { this[it.name] = it }
+        knownPrimitiveTypes.forEach { this[it.name] = it }
     }.toMutableMap()
 
     private val methods: MutableMap<ReferenceType, Set<Method>> = mutableMapOf()
     private val constructors = mutableMapOf<ReferenceType, Set<Constructor>>()
     private val fields = mutableMapOf<ReferenceType, Set<Field>>()
 
-    operator fun contains(qualifiedName: String) = typeMap.contains(qualifiedName)
+    /**
+     * Tells whether a given type name is in the scope.
+     * @param qualifiedName The fully qualified type name.
+     */
+    operator fun contains(qualifiedName: String): Boolean = typeMap.contains(qualifiedName)
 
-    operator fun get(qualifiedName: String) = getTypeByName(qualifiedName).getOrElse { null }
+    /**
+     * Gets a [ReferenceType] from the scope by type name.
+     * @param qualifiedName The fully qualified type name.
+     * @return The [ReferenceType] if found, `null` otherwise.
+     */
+    operator fun get(qualifiedName: String): ReferenceType? = getTypeByName(qualifiedName).getOrElse { null }
 
-    fun getTypeByName(qualifiedName: String) = (typeMap[qualifiedName] as? ReferenceType).toOption()
+    /**
+     * Gets a [ReferenceType] from the scope by type name.
+     * @param qualifiedName The fully qualified type name.
+     * @return A [Some] if found, [None] otherwise.
+     */
+    fun getTypeByName(qualifiedName: String): Option<ReferenceType> =
+        (typeMap[qualifiedName] as? ReferenceType).toOption()
 
-    fun getTypeVariable(typeName: String, variableName: String) =
-        (typeMap["$typeName->$variableName"] as? TypeVariable).toOption()
+    /**
+     * Gets the set of methods of the given type.
+     * @param referenceType The type.
+     * @return A [Some] if found, [None] otherwise.
+     */
+    fun getMethods(referenceType: ReferenceType): Option<Set<Method>> = methods[referenceType].toOption()
+
+    /**
+     * Gets the set of constructors of the given type.
+     * @param referenceType The type.
+     * @return A [Some] if found, [None] otherwise.
+     */
+    fun getConstructors(referenceType: ReferenceType): Option<Set<Constructor>> = constructors[referenceType].toOption()
+
+    /**
+     * Gets the set of fields of the given type.
+     * @param referenceType The type.
+     * @return A [Some] if found, [None] otherwise.
+     */
+    fun getFields(referenceType: ReferenceType): Option<Set<Field>> = fields[referenceType].toOption()
 
     internal fun resolveNewTypes(block: ResolutionContext.() -> Unit) = ResolutionContext(this, block).resolve()
 
@@ -44,7 +74,11 @@ class ReflectionScope {
         private val danglingTypeReferences = mutableMapOf<FlexibleTypeReference, String>()
         private val typesInScope get() = scope.typeMap
 
-        val newlyResolvedTypes = mutableMapOf<String, Type>()
+        val newlyResolvedTypeVariablesForReferenceTypes = mutableMapOf<String, TypeVariable<ReferenceType>>()
+
+        val newlyResolvedTypeVariablesForMethods = mutableMapOf<String, TypeVariable<Method>>()
+
+        val newlyResolvedTypes = mutableMapOf<String, ReferenceType>()
 
         val newlyResolvedMethods = mutableMapOf<ReferenceType, Set<Method>>()
 
@@ -52,15 +86,26 @@ class ReflectionScope {
 
         val newlyResolvedFields = mutableMapOf<ReferenceType, Set<Field>>()
 
-        fun findResolvedTypeVariable(qualifiedName: String) =
-            scope.getTypeByName(qualifiedName).getOrElse { newlyResolvedTypes.getValue(qualifiedName) } as TypeVariable
+        fun findResolvedTypeVariable(typeName: String, varName: String) =
+            if (typeName in scope || typeName in newlyResolvedTypes)
+                findResolvedType(typeName).typeParameters.single { it.name == varName }
+            else
+                newlyResolvedTypeVariablesForReferenceTypes.getValue("$typeName->$varName")
+
+        fun findResolvedTypeVariable(typeName: String, methodSig: String, varName: String): TypeVariable<Method> =
+            newlyResolvedTypeVariablesForMethods.getValue("$typeName::$methodSig->$varName")
 
         fun findResolvedType(qualifiedName: String) =
             scope.getTypeByName(qualifiedName).getOrElse { newlyResolvedTypes.getValue(qualifiedName) }
 
         fun newTypeReference(qualifiedName: String, materialization: Materialization = Materialization.EMPTY) =
-            if (qualifiedName == ObjectType.name) ObjectTypeReference
-            else FlexibleTypeReference(materialization).also { danglingTypeReferences[it] = qualifiedName }
+            FlexibleTypeReference(materialization).also { danglingTypeReferences[it] = qualifiedName }
+
+        fun newTypeVariableReference(typeName: String, varName: String) =
+            FlexibleTypeReference().also { it.bind(findResolvedTypeVariable(typeName, varName)) }
+
+        fun newTypeVariableReference(typeName: String, methodSig: String, varName: String) =
+            FlexibleTypeReference().also { it.bind(findResolvedTypeVariable(typeName, methodSig, varName)) }
 
         fun resolve() {
             this.block()
@@ -68,7 +113,8 @@ class ReflectionScope {
                 r.bind(scope.getTypeByName(t).getOrElse { newlyResolvedTypes.getValue(t) })
             }
             // Ensure that the lazy property is initialized by accessing the getter
-            newlyResolvedTypes.values.filterIsInstance<TypeVariable>().forEach { it.declaration }
+            newlyResolvedTypeVariablesForMethods.values.forEach { it.declaration }
+            newlyResolvedTypeVariablesForReferenceTypes.values.forEach { it.declaration }
 
             scope.typeMap.putAll(newlyResolvedTypes.filterKeys { it !in typesInScope })
             scope.methods.putAll(newlyResolvedMethods)

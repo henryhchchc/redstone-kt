@@ -17,6 +17,9 @@
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <EXTENSION ID="com.intellij.execution.ExternalSystemRunConfigurationJavaExtension">
+      <extension name="coverage" sample_coverage="false" />
+    </EXTENSION>
     <DebugAllEnabled>false</DebugAllEnabled>
     <method v="2" />
   </configuration>

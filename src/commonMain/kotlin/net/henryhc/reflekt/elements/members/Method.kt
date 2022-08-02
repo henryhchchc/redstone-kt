@@ -18,8 +18,8 @@ class Method(
     override val modifiers: AccessModifiers,
     override val declaration: ReferenceType,
     override val parameterTypes: List<TypeReference>,
-    override val typeParameters: List<TypeVariable>
-) : Invokable, GenericDeclaration, Member {
+    override val typeParameters: List<TypeVariable<Method>>
+) : Invokable, GenericDeclaration<Method>, Member {
     override fun toString() = buildString {
         append(declaration.toString())
         append("::")

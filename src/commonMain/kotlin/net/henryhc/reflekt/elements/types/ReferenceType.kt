@@ -3,7 +3,6 @@ package net.henryhc.reflekt.elements.types
 import net.henryhc.reflekt.AccessModifiers
 import net.henryhc.reflekt.AccessModifiers.Known.ACC_PUBLIC
 import net.henryhc.reflekt.elements.GenericDeclaration
-import net.henryhc.reflekt.elements.references.ObjectTypeReference
 import net.henryhc.reflekt.elements.references.TypeReference
 
 /**
@@ -15,10 +14,10 @@ import net.henryhc.reflekt.elements.references.TypeReference
 open class ReferenceType(
     override val name: String,
     val modifiers: AccessModifiers = ACC_PUBLIC,
-    override val typeParameters: List<TypeVariable> = emptyList(),
-    val superType: TypeReference? = ObjectTypeReference,
+    override val typeParameters: List<TypeVariable<ReferenceType>> = emptyList(),
+    val superType: TypeReference?,
     val implementedInterfaces: List<TypeReference> = emptyList(),
-) : Type(), GenericDeclaration {
+) : Type(), GenericDeclaration<ReferenceType> {
 
     override fun toString(): String = buildString {
         append(name)

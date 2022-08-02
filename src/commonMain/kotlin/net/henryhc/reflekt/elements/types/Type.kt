@@ -12,8 +12,10 @@ import net.henryhc.reflekt.elements.references.Materialization
 sealed class Type {
     abstract val name: String
 
-    fun makeArrayType(materialization: Materialization) = ArrayType(makeReference(materialization))
+    fun makeArrayType(materialization: Materialization = Materialization.EMPTY) =
+        ArrayType(makeReference(materialization))
 
-    fun makeReference(materialization: Materialization) = FlexibleTypeReference(materialization).also { it.bind(this) }
+    fun makeReference(materialization: Materialization = Materialization.EMPTY) =
+        FlexibleTypeReference(materialization).also { it.bind(this) }
 }
 

@@ -1,14 +1,17 @@
 package net.henryhc.reflekt.jvm
 
+import arrow.core.None
+import arrow.core.Some
 import net.henryhc.reflekt.ReflectionScope
 import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.ObjectType
 import org.example.ComplicatedType
 import org.example.SimpleType
-import org.example.TypeWithMethod
+import org.example.TypeWithMembers
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 internal class ReflectionScopeExtensionsTest {
 
@@ -44,16 +47,47 @@ internal class ReflectionScopeExtensionsTest {
     }
 
 
-
     @Test
     fun addClassWithMethod() {
         val scope = ReflectionScope()
-        val jvmType = TypeWithMethod::class.java
+        val jvmType = TypeWithMembers::class.java
         scope.addClass(jvmType)
 
         assert(jvmType.name in scope)
-        val type = scope[jvmType.name] as ReferenceType
-        assertNotNull(type.superType)
-        assertEquals(ObjectType, type.superType?.type)
+        val type = scope[jvmType.name]!!
+        when (val m = scope.getMethods(type)) {
+            None -> fail("Fail to get the methods")
+            is Some -> assertEquals(2, m.value.size)
+        }
     }
+
+    @Test
+    fun addClassWithFields() {
+        val scope = ReflectionScope()
+        val jvmType = TypeWithMembers::class.java
+        scope.addClass(jvmType)
+
+        assert(jvmType.name in scope)
+        val type = scope[jvmType.name]!!
+        when (val f = scope.getFields(type)) {
+            None -> fail("Fail to get the fields")
+            is Some -> assertEquals(1, f.value.size)
+        }
+    }
+
+
+    @Test
+    fun addClassWithConstructors() {
+        val scope = ReflectionScope()
+        val jvmType = TypeWithMembers::class.java
+        scope.addClass(jvmType)
+
+        assert(jvmType.name in scope)
+        val type = scope[jvmType.name]!!
+        when (val f = scope.getConstructors(type)) {
+            None -> fail("Fail to get the constructors")
+            is Some -> assertEquals(1, f.value.size)
+        }
+    }
+
 }
