@@ -5,6 +5,7 @@ import arrow.core.Some
 import net.henryhc.reflekt.ReflectionScope
 import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.ObjectType
+import net.henryhc.reflekt.elements.types.PrimitiveType
 import org.example.ComplicatedType
 import org.example.SimpleType
 import org.example.TypeWithMembers
@@ -14,6 +15,14 @@ import kotlin.test.assertNotNull
 import kotlin.test.fail
 
 internal class ReflectionScopeExtensionsTest {
+
+
+    @Test
+    fun testAddEssentialTypes() {
+        val scope = ReflectionScope()
+        scope.addEssentialTypes()
+        assert(PrimitiveType.ALL.all { it.boxedTypeName in scope })
+    }
 
     @Test
     fun addSimpleClass() {
@@ -54,7 +63,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assert(jvmType.name in scope)
-        val type = scope[jvmType.name]!!
+        val type = scope[jvmType.name] as ReferenceType
         when (val m = scope.getMethods(type)) {
             None -> fail("Fail to get the methods")
             is Some -> assertEquals(2, m.value.size)
@@ -68,7 +77,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assert(jvmType.name in scope)
-        val type = scope[jvmType.name]!!
+        val type = scope[jvmType.name] as ReferenceType
         when (val f = scope.getFields(type)) {
             None -> fail("Fail to get the fields")
             is Some -> assertEquals(1, f.value.size)
@@ -83,7 +92,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assert(jvmType.name in scope)
-        val type = scope[jvmType.name]!!
+        val type = scope[jvmType.name] as ReferenceType
         when (val f = scope.getConstructors(type)) {
             None -> fail("Fail to get the constructors")
             is Some -> assertEquals(1, f.value.size)

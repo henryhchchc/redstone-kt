@@ -17,7 +17,7 @@ class WildcardType(
 
     private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single().type == ObjectType
 
-    override fun toString() = buildString {
+    override fun toString(): String = buildString {
         append('?')
         if (upperBounds.isNotEmpty() && !isImplicitUpperbound()) {
             append(" extends ")
