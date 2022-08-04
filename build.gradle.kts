@@ -1,7 +1,7 @@
 @file:Suppress("UNUSED_VARIABLE")
 
 plugins {
-    kotlin("multiplatform") version "1.7.10"
+    kotlin("multiplatform") version "1.7.20-Beta"
 }
 
 group = "net.henryhc"
@@ -16,7 +16,11 @@ kotlin {
     targets.all {
         compilations.all {
             kotlinOptions {
-                freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-opt-in=kotlin.RequiresOptIn",
+                    "-Xextended-compiler-checks",
+//                    "-Xuse-k2"
+                )
             }
         }
     }
@@ -27,7 +31,6 @@ kotlin {
                 jvmTarget = "11"
                 freeCompilerArgs = freeCompilerArgs + listOf(
                     "-Xbackend-threads=0",
-                    "-Xextended-compiler-checks"
                 )
             }
         }
