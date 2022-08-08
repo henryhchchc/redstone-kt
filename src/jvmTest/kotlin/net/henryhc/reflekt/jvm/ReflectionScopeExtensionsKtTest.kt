@@ -1,27 +1,24 @@
 package net.henryhc.reflekt.jvm
 
-import arrow.core.None
-import arrow.core.Some
 import net.henryhc.reflekt.ReflectionScope
-import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.ObjectType
 import net.henryhc.reflekt.elements.types.PrimitiveType
+import net.henryhc.reflekt.elements.types.ReferenceType
 import org.example.ComplicatedType
 import org.example.SimpleType
 import org.example.TypeWithMembers
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.fail
+import kotlin.test.assertTrue
 
 internal class ReflectionScopeExtensionsTest {
-
 
     @Test
     fun testAddEssentialTypes() {
         val scope = ReflectionScope()
         scope.addEssentialTypes()
-        assert(PrimitiveType.ALL.all { it.boxedTypeName in scope })
+        assertTrue { PrimitiveType.ALL.all { it.boxedTypeName in scope } }
     }
 
     @Test
@@ -30,7 +27,7 @@ internal class ReflectionScopeExtensionsTest {
         val jvmType = SimpleType::class.java
         scope.addClass(jvmType)
 
-        assert(jvmType.name in scope)
+        assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ReferenceType
         assertNotNull(type.superType)
         assertEquals(ObjectType, type.superType?.type)
@@ -43,8 +40,8 @@ internal class ReflectionScopeExtensionsTest {
         val simpleType = SimpleType::class.java
         scope.addClass(complicatedType)
 
-        assert(complicatedType.name in scope)
-        assert(simpleType.name in scope)
+        assertTrue { complicatedType.name in scope }
+        assertTrue { simpleType.name in scope }
 
         val complicatedReferenceType = scope[complicatedType.name] as ReferenceType
         val simpleReferenceType = scope[simpleType.name] as ReferenceType
@@ -62,12 +59,11 @@ internal class ReflectionScopeExtensionsTest {
         val jvmType = TypeWithMembers::class.java
         scope.addClass(jvmType)
 
-        assert(jvmType.name in scope)
+        assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ReferenceType
-        when (val m = scope.getMethods(type)) {
-            None -> fail("Fail to get the methods")
-            is Some -> assertEquals(2, m.value.size)
-        }
+        scope.getMethods((type))
+            .also { assertTrue { it.isDefined() } }
+            .tap { assertEquals(2, it.size) }
     }
 
     @Test
@@ -76,14 +72,12 @@ internal class ReflectionScopeExtensionsTest {
         val jvmType = TypeWithMembers::class.java
         scope.addClass(jvmType)
 
-        assert(jvmType.name in scope)
+        assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ReferenceType
-        when (val f = scope.getFields(type)) {
-            None -> fail("Fail to get the fields")
-            is Some -> assertEquals(1, f.value.size)
-        }
+        scope.getFields(type)
+            .also { assertTrue { it.isDefined() } }
+            .tap { assertEquals(1, it.size) }
     }
-
 
     @Test
     fun addClassWithConstructors() {
@@ -91,12 +85,11 @@ internal class ReflectionScopeExtensionsTest {
         val jvmType = TypeWithMembers::class.java
         scope.addClass(jvmType)
 
-        assert(jvmType.name in scope)
+        assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ReferenceType
-        when (val f = scope.getConstructors(type)) {
-            None -> fail("Fail to get the constructors")
-            is Some -> assertEquals(1, f.value.size)
-        }
+        scope.getConstructors(type)
+            .also { assertTrue { it.isDefined() } }
+            .tap { assertEquals(1, it.size) }
     }
 
 }
