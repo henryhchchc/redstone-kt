@@ -5,6 +5,7 @@ import net.henryhc.reflekt.elements.types.ObjectType
 import net.henryhc.reflekt.elements.types.PrimitiveType
 import net.henryhc.reflekt.elements.types.ReferenceType
 import org.example.ComplicatedType
+import org.example.I3
 import org.example.SimpleType
 import org.example.TypeWithMembers
 import kotlin.test.Test
@@ -31,6 +32,21 @@ internal class ReflectionScopeExtensionsTest {
         val type = scope[jvmType.name] as ReferenceType
         assertNotNull(type.superType)
         assertEquals(ObjectType, type.superType?.type)
+    }
+
+    @Test
+    fun addRecursiveInterface() {
+        val scope = ReflectionScope()
+        val jvmType = I3::class.java
+        scope.addClass(jvmType)
+
+        assertTrue { jvmType.name in scope }
+        val type = scope[jvmType.name] as ReferenceType
+        assertEquals(1, type.typeParameters.size)
+        val tv1 = type.typeParameters.single()
+        assertEquals(1, tv1.upperBounds.size)
+        val ub = tv1.upperBounds.single()
+        assertEquals(1, ub.materialization.size)
     }
 
     @Test

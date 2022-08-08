@@ -1,5 +1,8 @@
 package net.henryhc.reflekt.elements.references
 
+import net.henryhc.reflekt.elements.references.materialization.Materialization
+import net.henryhc.reflekt.elements.references.materialization.Materialization.Companion.materialize
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.Type
 
 /**
@@ -7,6 +10,14 @@ import net.henryhc.reflekt.elements.types.Type
  */
 class FixedTypeReference(
     override val type: Type,
-    override val materialization: Materialization = Materialization.EMPTY
-) : TypeReference {
+    materialization: Materialization = Materialization.EMPTY
+) : TypeReference() {
+
+    override val materialization: Materialization
+
+    init {
+        val relevantTypeVariables = if (type is ReferenceType) type.typeParameters else emptyList()
+        this.materialization = materialize(materialization.filterKeys { it in relevantTypeVariables })
+    }
+
 }

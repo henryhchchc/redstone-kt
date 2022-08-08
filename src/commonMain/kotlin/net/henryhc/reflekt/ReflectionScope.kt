@@ -5,7 +5,8 @@ import net.henryhc.reflekt.elements.members.Constructor
 import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.DanglingTypeReference
-import net.henryhc.reflekt.elements.references.Materialization
+import net.henryhc.reflekt.elements.references.materialization.DanglingMaterialization
+import net.henryhc.reflekt.elements.references.materialization.Materialization
 import net.henryhc.reflekt.elements.types.*
 
 
@@ -86,6 +87,22 @@ class ReflectionScope {
 
         val newlyResolvedFields = mutableMapOf<ReferenceType, Set<Field>>()
 
+        val danglingMaterializations = mutableSetOf<DanglingMaterialization>()
+
+
+        private val qualifiedNameRegex = "(?<typeName>[\\w.\$]+)(::(?<methodSig>\\w+\\(.*?\\)))?->(?<varName>\\w+)".toRegex()
+        fun findTypeVariable(qualifiedName: String): TypeVariable<*> {
+            val match = qualifiedNameRegex.matchEntire(qualifiedName)!!
+            val typeName = match.groups[1]!!.value
+            val methodSig = match.groups[3]?.value
+            val varName = match.groups[4]!!.value
+            return if (methodSig != null) {
+                findResolvedTypeVariable(typeName, methodSig, varName)
+            } else {
+                findResolvedTypeVariable(typeName, varName)
+            }
+        }
+
         fun findResolvedTypeVariable(typeName: String, varName: String) =
             if (typeName in scope || typeName in newlyResolvedTypes)
                 (findResolvedType(typeName) as ReferenceType).typeParameters.single { it.name == varName }
@@ -102,15 +119,20 @@ class ReflectionScope {
             DanglingTypeReference(materialization).also { danglingTypeReferences[it] = qualifiedName }
 
         fun newTypeVariableReference(typeName: String, varName: String) =
-            findResolvedTypeVariable(typeName, varName).makeReference()
+            DanglingTypeReference().also { danglingTypeReferences[it] = "$typeName->$varName" }
 
         fun newTypeVariableReference(typeName: String, methodSig: String, varName: String) =
-            findResolvedTypeVariable(typeName, methodSig, varName).makeReference()
+            DanglingTypeReference().also { danglingTypeReferences[it] = "$typeName::$methodSig->$varName" }
 
         fun resolve() {
             this.block()
+            danglingMaterializations.forEach { it.bind(this) }
             danglingTypeReferences.forEach { (r, t) ->
-                r.bind(scope.getTypeByName(t).getOrElse { newlyResolvedTypes.getValue(t) })
+                if (t.contains("->")) {
+                    r.bind(findTypeVariable(t))
+                } else {
+                    r.bind(scope.getTypeByName(t).getOrElse { newlyResolvedTypes.getValue(t) })
+                }
             }
             // Ensure that the lazy property is initialized by accessing the getter
             newlyResolvedTypeVariablesForMethods.values.forEach { it.declaration }

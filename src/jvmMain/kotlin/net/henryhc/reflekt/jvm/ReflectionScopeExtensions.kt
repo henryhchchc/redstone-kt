@@ -8,6 +8,8 @@ import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Member
 import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.*
+import net.henryhc.reflekt.elements.references.materialization.DanglingMaterialization
+import net.henryhc.reflekt.elements.references.materialization.Materialization
 import net.henryhc.reflekt.elements.types.*
 
 
@@ -81,14 +83,14 @@ private inline fun <reified T : Member> List<T>.groupByDeclaration() =
     this.groupBy { it.declaration }.mapValues { (_, v) -> v.toSet() }
 
 private fun ReflectionScope.ResolutionContext.generateMaterialization(jvmType: JvmParameterizedType) =
-    Materialization(jvmType.run { (rawType as JvmClass).typeParameters.zip(actualTypeArguments) }.associate { (t, a) ->
-        findResolvedTypeVariable(jvmType.qualifiedTypeName, t.name) to makeReference(a)
-    })
+    DanglingMaterialization(jvmType.run { (rawType as JvmClass).typeParameters.zip(actualTypeArguments) }.associate { (t, a) ->
+        t.qualifiedTypeName to makeReference(a)
+    }).also(danglingMaterializations::add)
 
 private inline fun <reified D : GenericDeclaration<D>> ReflectionScope.ResolutionContext.resolve(typeVariable: JvmTypeVariable) =
     TypeVariable<D>(
         typeVariable.name,
-        typeVariable.bounds.map { b -> newTypeReference(b.qualifiedTypeName) }
+        typeVariable.bounds.map { b -> newTypeReference(b.qualifiedTypeName, if(b is JvmParameterizedType) generateMaterialization(b) else Materialization.EMPTY) }
     )
 
 private fun ReflectionScope.ResolutionContext.resolve(jvmType: JvmWildcardType) =

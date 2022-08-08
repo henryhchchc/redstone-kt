@@ -61,5 +61,3 @@ sealed class PrimitiveType(override val name: String, val boxedTypeName: String)
     object ShortType : PrimitiveType("short", "java.lang.Double")
 
 }
-
-

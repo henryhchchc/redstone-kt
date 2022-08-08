@@ -27,4 +27,24 @@ open class ReferenceType(
             append('>')
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as ReferenceType
+
+        if (name != other.name) return false
+        if (modifiers != other.modifiers) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + modifiers.hashCode()
+        return result
+    }
+
+
 }

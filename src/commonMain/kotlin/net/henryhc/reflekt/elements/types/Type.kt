@@ -1,8 +1,8 @@
 package net.henryhc.reflekt.elements.types
 
 import net.henryhc.reflekt.elements.references.FixedTypeReference
-import net.henryhc.reflekt.elements.references.Materialization
 import net.henryhc.reflekt.elements.references.TypeReference
+import net.henryhc.reflekt.elements.references.materialization.Materialization
 
 /**
  * Denotes a type in JVM.

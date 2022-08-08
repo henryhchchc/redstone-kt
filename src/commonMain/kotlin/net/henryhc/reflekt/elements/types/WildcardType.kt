@@ -14,7 +14,6 @@ class WildcardType(
 
     override val name: String get() = toString()
 
-
     private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single().type == ObjectType
 
     override fun toString(): String = buildString {
@@ -28,4 +27,6 @@ class WildcardType(
             append(lowerBounds.joinToString(", "))
         }
     }
+
+
 }
