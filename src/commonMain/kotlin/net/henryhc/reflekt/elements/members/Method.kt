@@ -20,7 +20,7 @@ class Method(
     override val parameterTypes: List<TypeReference>,
     override val typeParameters: List<TypeVariable<Method>>
 ) : Invokable, GenericDeclaration<Method>, Member {
-    override fun toString() = buildString {
+    override fun toString(): String = buildString {
         append(declaration.toString())
         append("::")
         append(name)

@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package net.henryhc.reflekt.types
 
 import net.henryhc.reflekt.elements.types.ObjectType
