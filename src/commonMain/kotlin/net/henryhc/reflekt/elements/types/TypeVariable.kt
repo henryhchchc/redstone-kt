@@ -25,10 +25,24 @@ class TypeVariable<D : GenericDeclaration<D>>(
 
     override fun toString(): String = buildString {
         append(name)
-        val displayedBounds = upperBounds.filterNot { it.type == ObjectType }
-        if (displayedBounds.isNotEmpty()) {
-            append(": ")
-            append(displayedBounds.joinToString(", "))
-        }
+        if (upperBounds.isNotEmpty())
+            append(upperBounds.joinToString(", ", prefix = ": "))
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as TypeVariable<*>
+
+        if (name != other.name) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+
+
 }

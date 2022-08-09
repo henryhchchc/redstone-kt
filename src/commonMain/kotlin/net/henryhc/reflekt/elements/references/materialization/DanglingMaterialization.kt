@@ -1,6 +1,5 @@
 package net.henryhc.reflekt.elements.references.materialization
 
-import net.henryhc.reflekt.ReflectionScope
 import net.henryhc.reflekt.elements.references.TypeReference
 import net.henryhc.reflekt.elements.types.TypeVariable
 import net.henryhc.reflekt.utils.identityHashCode
@@ -8,14 +7,21 @@ import net.henryhc.reflekt.utils.identityHashCode
 /**
  * Denotes a materialization allowing dangling state.
  */
-class DanglingMaterialization(private val danglingMapping: Map<String, TypeReference>) : Materialization() {
+class DanglingMaterialization(private var danglingMapping: Map<String, TypeReference>) : Materialization() {
 
     private lateinit var rawMapping: Map<TypeVariable<*>, TypeReference>
 
-    internal fun bind(ctx: ReflectionScope.ResolutionContext) {
+    /**
+     * Bind the type variable to actual values.
+     * Can be called only once.
+     */
+    fun bind(resolveBlock: (String) -> TypeVariable<*>) {
+        if (this::rawMapping.isInitialized)
+            return
         rawMapping = buildMap {
-            danglingMapping.forEach { (k, v) -> this[ctx.findTypeVariable(k)] = v }
+            danglingMapping.forEach { (k, v) -> this[resolveBlock(k)] = v }
         }
+        danglingMapping = emptyMap()
     }
 
     override val entries: Set<Map.Entry<TypeVariable<*>, TypeReference>> get() = rawMapping.entries

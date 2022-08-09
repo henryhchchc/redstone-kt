@@ -34,16 +34,11 @@ open class ReferenceType(
 
         other as ReferenceType
 
-        if (name != other.name) return false
-        if (modifiers != other.modifiers) return false
-
-        return true
+        return this.toString() == other.toString()
     }
 
     override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + modifiers.hashCode()
-        return result
+        return this.toString().hashCode()
     }
 
 

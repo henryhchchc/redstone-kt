@@ -34,9 +34,12 @@ abstract class TypeReference {
     override fun toString(): String = buildString {
         append(type.name)
         if (materialization.isNotEmpty()) {
-            append('<')
-            append((type as ReferenceType).typeParameters.joinToString(",") { materialization[it].toString() })
-            append('>')
+            append(
+                (type as ReferenceType).typeParameters.joinToString(
+                    separator = ",",
+                    prefix = "<",
+                    postfix = ">"
+                ) { materialization[it].toString() })
         }
     }
 

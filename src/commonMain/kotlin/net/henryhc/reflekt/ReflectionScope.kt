@@ -90,7 +90,9 @@ class ReflectionScope {
         val danglingMaterializations = mutableSetOf<DanglingMaterialization>()
 
 
-        private val qualifiedNameRegex = "(?<typeName>[\\w.\$]+)(::(?<methodSig>\\w+\\(.*?\\)))?->(?<varName>\\w+)".toRegex()
+        private val qualifiedNameRegex =
+            "(?<typeName>[\\w.\$]+)(::(?<methodSig>\\w+\\(.*?\\)))?->(?<varName>\\w+)".toRegex()
+
         fun findTypeVariable(qualifiedName: String): TypeVariable<*> {
             val match = qualifiedNameRegex.matchEntire(qualifiedName)!!
             val typeName = match.groups[1]!!.value
@@ -126,7 +128,7 @@ class ReflectionScope {
 
         fun resolve() {
             this.block()
-            danglingMaterializations.forEach { it.bind(this) }
+            danglingMaterializations.forEach { it.bind { tv -> findTypeVariable(tv) } }
             danglingTypeReferences.forEach { (r, t) ->
                 if (t.contains("->")) {
                     r.bind(findTypeVariable(t))

@@ -30,6 +30,8 @@ class DanglingTypeReference(
         this.materialization = materialize(materialization.filterKeys { it in relevantTypeVariables })
     }
 
+    override fun toString(): String = if (!this::type.isInitialized) "<Dangling>" else super.toString()
+
     override fun hashCode(): Int {
         if (!this::type.isInitialized)
             return this.identityHashCode()
