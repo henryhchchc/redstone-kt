@@ -8,6 +8,7 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  */
 sealed class Materialization : Map<TypeVariable<*>, TypeReference> {
 
+
     companion object {
         /**
          * Denotes an empty [Materialization].
@@ -27,5 +28,17 @@ sealed class Materialization : Map<TypeVariable<*>, TypeReference> {
         fun materialize(mapping: Map<TypeVariable<*>, TypeReference>): Materialization =
             FixedMaterialization(mapping)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is Materialization) return false
+
+        return entries == other.entries
+    }
+
+    override fun hashCode(): Int {
+        return entries.hashCode()
+    }
+
 }
 

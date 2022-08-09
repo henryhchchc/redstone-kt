@@ -3,6 +3,7 @@ package net.henryhc.reflekt.elements.references.materialization
 import net.henryhc.reflekt.ReflectionScope
 import net.henryhc.reflekt.elements.references.TypeReference
 import net.henryhc.reflekt.elements.types.TypeVariable
+import net.henryhc.reflekt.utils.identityHashCode
 
 /**
  * Denotes a materialization allowing dangling state.
@@ -25,4 +26,16 @@ class DanglingMaterialization(private val danglingMapping: Map<String, TypeRefer
     override fun containsValue(value: TypeReference): Boolean = rawMapping.containsValue(value)
     override fun get(key: TypeVariable<*>): TypeReference? = rawMapping.get(key)
     override fun isEmpty(): Boolean = rawMapping.isEmpty()
+
+    override fun hashCode(): Int {
+        if (!this::rawMapping.isInitialized)
+            return this.identityHashCode()
+        return super.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (!this::rawMapping.isInitialized)
+            return this.identityHashCode() == other?.identityHashCode()
+        return super.equals(other)
+    }
 }
