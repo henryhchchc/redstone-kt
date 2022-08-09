@@ -28,7 +28,7 @@ fun ReflectionScope.addClass(jvmClass: JvmClass): Unit = resolveNewTypes {
         DeepRecursiveFunction<JvmType, _> {
             if (it !in this@buildSet) {
                 if ((it is JvmClass && !it.isArray) || it is JvmTypeVariable) add(it)
-                it.dependencies.forEach { callRecursive(it) }
+                it.dependencies.forEach { d -> callRecursive(d) }
             }
         }.invoke(jvmClass)
     }

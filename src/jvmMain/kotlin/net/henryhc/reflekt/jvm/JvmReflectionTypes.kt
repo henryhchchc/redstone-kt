@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package net.henryhc.reflekt.jvm
 
 
@@ -9,6 +11,7 @@ typealias JvmType = java.lang.reflect.Type
 /**
  * Denotes a class in JVM reflection APIs.
  */
+@Suppress("RemoveRedundantQualifierName")
 typealias JvmClass = java.lang.Class<*>
 
 /**

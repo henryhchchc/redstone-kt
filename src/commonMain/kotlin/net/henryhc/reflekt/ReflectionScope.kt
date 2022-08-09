@@ -93,7 +93,7 @@ class ReflectionScope {
         private val qualifiedNameRegex =
             "(?<typeName>[\\w.\$]+)(::(?<methodSig>\\w+\\(.*?\\)))?->(?<varName>\\w+)".toRegex()
 
-        fun findTypeVariable(qualifiedName: String): TypeVariable<*> {
+        private fun findTypeVariable(qualifiedName: String): TypeVariable<*> {
             val match = qualifiedNameRegex.matchEntire(qualifiedName)!!
             val typeName = match.groups[1]!!.value
             val methodSig = match.groups[3]?.value

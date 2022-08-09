@@ -2,6 +2,7 @@ package org.example;
 
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class TypeWithMembers {
 
     private int x = 10;

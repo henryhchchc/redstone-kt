@@ -30,7 +30,7 @@ class DanglingMaterialization(private var danglingMapping: Map<String, TypeRefer
     override val values: Collection<TypeReference> get() = rawMapping.values
     override fun containsKey(key: TypeVariable<*>): Boolean = rawMapping.containsKey(key)
     override fun containsValue(value: TypeReference): Boolean = rawMapping.containsValue(value)
-    override fun get(key: TypeVariable<*>): TypeReference? = rawMapping.get(key)
+    override fun get(key: TypeVariable<*>): TypeReference? = rawMapping[key]
     override fun isEmpty(): Boolean = rawMapping.isEmpty()
 
     override fun hashCode(): Int {
