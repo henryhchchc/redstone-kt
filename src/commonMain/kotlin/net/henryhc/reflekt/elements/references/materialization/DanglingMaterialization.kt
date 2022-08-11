@@ -1,15 +1,16 @@
 package net.henryhc.reflekt.elements.references.materialization
 
 import net.henryhc.reflekt.elements.references.TypeReference
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.TypeVariable
 import net.henryhc.reflekt.utils.identityHashCode
 
 /**
  * Denotes a materialization allowing dangling state.
  */
-class DanglingMaterialization(private var danglingMapping: Map<String, TypeReference>) : Materialization() {
+class DanglingMaterialization(private var danglingMapping: Map<String, TypeReference<out ReferenceType>>) : Materialization() {
 
-    private lateinit var rawMapping: Map<TypeVariable<*>, TypeReference>
+    private lateinit var rawMapping: Map<TypeVariable<*>, TypeReference<out ReferenceType>>
 
     /**
      * Bind the type variable to actual values.
@@ -24,13 +25,13 @@ class DanglingMaterialization(private var danglingMapping: Map<String, TypeRefer
         danglingMapping = emptyMap()
     }
 
-    override val entries: Set<Map.Entry<TypeVariable<*>, TypeReference>> get() = rawMapping.entries
+    override val entries: Set<Map.Entry<TypeVariable<*>, TypeReference<out ReferenceType>>> get() = rawMapping.entries
     override val keys: Set<TypeVariable<*>> get() = rawMapping.keys
     override val size: Int get() = rawMapping.size
-    override val values: Collection<TypeReference> get() = rawMapping.values
+    override val values: Collection<TypeReference<out ReferenceType>> get() = rawMapping.values
     override fun containsKey(key: TypeVariable<*>): Boolean = rawMapping.containsKey(key)
-    override fun containsValue(value: TypeReference): Boolean = rawMapping.containsValue(value)
-    override fun get(key: TypeVariable<*>): TypeReference? = rawMapping[key]
+    override fun containsValue(value: TypeReference<out ReferenceType>): Boolean = rawMapping.containsValue(value)
+    override fun get(key: TypeVariable<*>): TypeReference<out ReferenceType>? = rawMapping[key]
     override fun isEmpty(): Boolean = rawMapping.isEmpty()
 
     override fun hashCode(): Int {

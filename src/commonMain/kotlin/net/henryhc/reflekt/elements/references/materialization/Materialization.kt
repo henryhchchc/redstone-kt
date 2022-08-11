@@ -1,12 +1,13 @@
 package net.henryhc.reflekt.elements.references.materialization
 
 import net.henryhc.reflekt.elements.references.TypeReference
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.TypeVariable
 
 /**
  * Denotes a mapping from type variables to their actual types.
  */
-sealed class Materialization : Map<TypeVariable<*>, TypeReference> {
+sealed class Materialization : Map<TypeVariable<*>, TypeReference<out ReferenceType>> {
 
 
     companion object {
@@ -19,13 +20,13 @@ sealed class Materialization : Map<TypeVariable<*>, TypeReference> {
         /**
          * Creates a materialization.
          */
-        fun materialize(vararg mappings: Pair<TypeVariable<*>, TypeReference>): Materialization =
+        fun materialize(vararg mappings: Pair<TypeVariable<*>, TypeReference<out ReferenceType>>): Materialization =
             FixedMaterialization(*mappings)
 
         /**
          * Creates a materialization.
          */
-        fun materialize(mapping: Map<TypeVariable<*>, TypeReference>): Materialization =
+        fun materialize(mapping: Map<TypeVariable<*>, TypeReference<out ReferenceType>>): Materialization =
             FixedMaterialization(mapping)
     }
 

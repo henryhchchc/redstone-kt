@@ -8,11 +8,11 @@ import net.henryhc.reflekt.elements.references.TypeReference
  * @property lowerBounds Lower bounds of the wildcard type for ? extends xxx.
  */
 class WildcardType(
-    val upperBounds: List<TypeReference> = emptyList(),
-    val lowerBounds: List<TypeReference> = emptyList()
+    val upperBounds: List<TypeReference<out ReferenceType>> = emptyList(),
+    val lowerBounds: List<TypeReference<out ReferenceType>> = emptyList()
 ) : Type() {
 
-    override val name: String get() = toString()
+    override val identifier: String get() = toString()
 
     private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single().type == ObjectType
 

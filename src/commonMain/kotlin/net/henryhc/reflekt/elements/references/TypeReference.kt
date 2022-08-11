@@ -1,7 +1,7 @@
 package net.henryhc.reflekt.elements.references
 
 import net.henryhc.reflekt.elements.references.materialization.Materialization
-import net.henryhc.reflekt.elements.types.ReferenceType
+import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
 import net.henryhc.reflekt.elements.types.Type
 
 /**
@@ -9,15 +9,15 @@ import net.henryhc.reflekt.elements.types.Type
  * @property type The type referring to.
  * @property materialization Known mapping from the type variables to the actual types.
  */
-abstract class TypeReference {
+abstract class TypeReference<T : Type> {
 
-    abstract val type: Type
+    abstract val type: T
 
     abstract val materialization: Materialization
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is TypeReference) return false
+        if (other !is TypeReference<*>) return false
 
         if (type != other.type) return false
         if (materialization != other.materialization) return false
@@ -32,10 +32,10 @@ abstract class TypeReference {
     }
 
     override fun toString(): String = buildString {
-        append(type.name)
+        append(type.identifier)
         if (materialization.isNotEmpty()) {
             append(
-                (type as ReferenceType).typeParameters.joinToString(
+                (type as ClassOrInterfaceType).typeParameters.joinToString(
                     separator = ",",
                     prefix = "<",
                     postfix = ">"

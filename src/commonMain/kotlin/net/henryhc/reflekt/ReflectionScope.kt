@@ -7,7 +7,10 @@ import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.DanglingTypeReference
 import net.henryhc.reflekt.elements.references.materialization.DanglingMaterialization
 import net.henryhc.reflekt.elements.references.materialization.Materialization
-import net.henryhc.reflekt.elements.types.*
+import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.PrimitiveType
+import net.henryhc.reflekt.elements.types.Type
+import net.henryhc.reflekt.elements.types.TypeVariable
 
 
 /**
@@ -16,13 +19,13 @@ import net.henryhc.reflekt.elements.types.*
 class ReflectionScope {
 
     private val typeMap: MutableMap<String, Type> = buildMap {
-        PrimitiveType.ALL.forEach { this[it.name] = it }
+        PrimitiveType.ALL.forEach { this[it.identifier] = it }
 //        this[ObjectType.name] = ObjectType
     }.toMutableMap()
 
-    private val methods: MutableMap<ReferenceType, Set<Method>> = mutableMapOf()
-    private val constructors = mutableMapOf<ReferenceType, Set<Constructor>>()
-    private val fields = mutableMapOf<ReferenceType, Set<Field>>()
+    private val methods: MutableMap<ClassOrInterfaceType, Set<Method>> = mutableMapOf()
+    private val constructors = mutableMapOf<ClassOrInterfaceType, Set<Constructor>>()
+    private val fields = mutableMapOf<ClassOrInterfaceType, Set<Field>>()
 
     /**
      * Tells whether a given type name is in the scope.
@@ -46,24 +49,24 @@ class ReflectionScope {
 
     /**
      * Gets the set of methods of the given type.
-     * @param referenceType The type.
+     * @param classOrInterfaceType The type.
      * @return A [Some] if found, [None] otherwise.
      */
-    fun getMethods(referenceType: ReferenceType): Option<Set<Method>> = methods[referenceType].toOption()
+    fun getMethods(classOrInterfaceType: ClassOrInterfaceType): Option<Set<Method>> = methods[classOrInterfaceType].toOption()
 
     /**
      * Gets the set of constructors of the given type.
-     * @param referenceType The type.
+     * @param classOrInterfaceType The type.
      * @return A [Some] if found, [None] otherwise.
      */
-    fun getConstructors(referenceType: ReferenceType): Option<Set<Constructor>> = constructors[referenceType].toOption()
+    fun getConstructors(classOrInterfaceType: ClassOrInterfaceType): Option<Set<Constructor>> = constructors[classOrInterfaceType].toOption()
 
     /**
      * Gets the set of fields of the given type.
-     * @param referenceType The type.
+     * @param classOrInterfaceType The type.
      * @return A [Some] if found, [None] otherwise.
      */
-    fun getFields(referenceType: ReferenceType): Option<Set<Field>> = fields[referenceType].toOption()
+    fun getFields(classOrInterfaceType: ClassOrInterfaceType): Option<Set<Field>> = fields[classOrInterfaceType].toOption()
 
     internal fun resolveNewTypes(block: ResolutionContext.() -> Unit) = ResolutionContext(this, block).resolve()
 
@@ -72,20 +75,20 @@ class ReflectionScope {
         private val block: ResolutionContext.() -> Unit
     ) {
 
-        private val danglingTypeReferences = mutableMapOf<DanglingTypeReference, String>()
+        private val danglingTypeReferences = mutableMapOf<DanglingTypeReference<out Type>, String>()
         val typesInScope get() = scope.typeMap
 
-        val newlyResolvedTypeVariablesForReferenceTypes = mutableMapOf<String, TypeVariable<ReferenceType>>()
+        val newlyResolvedTypeVariablesForClassOrInterfaceTypes = mutableMapOf<String, TypeVariable<ClassOrInterfaceType>>()
 
         val newlyResolvedTypeVariablesForMethods = mutableMapOf<String, TypeVariable<Method>>()
 
-        val newlyResolvedTypes = mutableMapOf<String, ReferenceType>()
+        val newlyResolvedTypes = mutableMapOf<String, ClassOrInterfaceType>()
 
-        val newlyResolvedMethods = mutableMapOf<ReferenceType, Set<Method>>()
+        val newlyResolvedMethods = mutableMapOf<ClassOrInterfaceType, Set<Method>>()
 
-        val newlyResolvedConstructors = mutableMapOf<ReferenceType, Set<Constructor>>()
+        val newlyResolvedConstructors = mutableMapOf<ClassOrInterfaceType, Set<Constructor>>()
 
-        val newlyResolvedFields = mutableMapOf<ReferenceType, Set<Field>>()
+        val newlyResolvedFields = mutableMapOf<ClassOrInterfaceType, Set<Field>>()
 
         val danglingMaterializations = mutableSetOf<DanglingMaterialization>()
 
@@ -107,9 +110,9 @@ class ReflectionScope {
 
         fun findResolvedTypeVariable(typeName: String, varName: String) =
             if (typeName in scope || typeName in newlyResolvedTypes)
-                (findResolvedType(typeName) as ReferenceType).typeParameters.single { it.name == varName }
+                (findResolvedType(typeName) as ClassOrInterfaceType).typeParameters.single { it.identifier == varName }
             else
-                newlyResolvedTypeVariablesForReferenceTypes.getValue("$typeName->$varName")
+                newlyResolvedTypeVariablesForClassOrInterfaceTypes.getValue("$typeName->$varName")
 
         fun findResolvedTypeVariable(typeName: String, methodSig: String, varName: String): TypeVariable<Method> =
             newlyResolvedTypeVariablesForMethods.getValue("$typeName::$methodSig->$varName")
@@ -117,14 +120,14 @@ class ReflectionScope {
         fun findResolvedType(qualifiedName: String) =
             scope.getTypeByName(qualifiedName).getOrElse { newlyResolvedTypes.getValue(qualifiedName) }
 
-        fun newTypeReference(qualifiedName: String, materialization: Materialization = Materialization.EMPTY) =
-            DanglingTypeReference(materialization).also { danglingTypeReferences[it] = qualifiedName }
+        fun <T: Type> newTypeReference(qualifiedName: String, materialization: Materialization = Materialization.EMPTY) =
+            DanglingTypeReference<T>(materialization).also { danglingTypeReferences[it] = qualifiedName }
 
         fun newTypeVariableReference(typeName: String, varName: String) =
-            DanglingTypeReference().also { danglingTypeReferences[it] = "$typeName->$varName" }
+            DanglingTypeReference<TypeVariable<ClassOrInterfaceType>>().also { danglingTypeReferences[it] = "$typeName->$varName" }
 
         fun newTypeVariableReference(typeName: String, methodSig: String, varName: String) =
-            DanglingTypeReference().also { danglingTypeReferences[it] = "$typeName::$methodSig->$varName" }
+            DanglingTypeReference<TypeVariable<Method>>().also { danglingTypeReferences[it] = "$typeName::$methodSig->$varName" }
 
         fun resolve() {
             this.block()
@@ -138,7 +141,7 @@ class ReflectionScope {
             }
             // Ensure that the lazy property is initialized by accessing the getter
             newlyResolvedTypeVariablesForMethods.values.forEach { it.declaration }
-            newlyResolvedTypeVariablesForReferenceTypes.values.forEach { it.declaration }
+            newlyResolvedTypeVariablesForClassOrInterfaceTypes.values.forEach { it.declaration }
 
             scope.typeMap.putAll(newlyResolvedTypes.filterKeys { it !in typesInScope })
             scope.methods.putAll(newlyResolvedMethods)

@@ -5,28 +5,33 @@ import net.henryhc.reflekt.elements.references.TypeReference
 
 /**
  * Denotes a type variable in [D].
- * @property name The name of the type variable.
+ * @property identifier The name of the type variable.
  * @property declaration The declaration the type variable belongs to.
  * @property upperBounds The upperbounds of the type variable.
  */
-class TypeVariable<D : GenericDeclaration<D>>(
-    override val name: String,
-    val upperBounds: List<TypeReference>
-) : Type() {
+class TypeVariable<D : GenericDeclaration<out D>>(
+    override val identifier: String,
+    val upperBounds: List<TypeReference<out ReferenceType>>
+) : ReferenceType() {
 
     private lateinit var _declaration: D
 
-    var declaration: D
-        get() = _declaration
-        set(value) {
-            if (!this::_declaration.isInitialized)
-                _declaration = value
-        }
+    val declaration: D get() = _declaration
+
+    /**
+     * Binds the type variable to its declaration.
+     */
+    fun bindDeclaration(decl: GenericDeclaration<*>) {
+        @Suppress("UNCHECKED_CAST")
+        decl as D
+        if (!this::_declaration.isInitialized)
+            _declaration = decl
+    }
 
     override fun toString(): String = buildString {
-        append(name)
+        append(identifier)
         if (upperBounds.isNotEmpty())
-            append(upperBounds.joinToString(", ", prefix = ": "))
+            append(upperBounds.joinToString(" & ", prefix = ": "))
     }
 
     override fun equals(other: Any?): Boolean {
@@ -35,13 +40,13 @@ class TypeVariable<D : GenericDeclaration<D>>(
 
         other as TypeVariable<*>
 
-        if (name != other.name) return false
+        if (identifier != other.identifier) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return name.hashCode()
+        return identifier.hashCode()
     }
 
 

@@ -4,7 +4,8 @@ import net.henryhc.reflekt.AccessModifiers
 import net.henryhc.reflekt.elements.GenericDeclaration
 import net.henryhc.reflekt.elements.Invokable
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.types.ReferenceType
+import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.Type
 import net.henryhc.reflekt.elements.types.TypeVariable
 
 /**
@@ -14,10 +15,10 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  */
 class Method(
     val name: String,
-    val returnType: TypeReference,
+    val returnType: TypeReference<out Type>,
     override val modifiers: AccessModifiers,
-    override val declaration: ReferenceType,
-    override val parameterTypes: List<TypeReference>,
+    override val declaration: ClassOrInterfaceType,
+    override val parameterTypes: List<TypeReference<out Type>>,
     override val typeParameters: List<TypeVariable<Method>>
 ) : Invokable, GenericDeclaration<Method>, Member {
     override fun toString(): String = buildString {
