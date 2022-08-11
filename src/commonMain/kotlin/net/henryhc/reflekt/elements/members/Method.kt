@@ -4,7 +4,8 @@ import net.henryhc.reflekt.AccessModifiers
 import net.henryhc.reflekt.elements.GenericDeclaration
 import net.henryhc.reflekt.elements.Invokable
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.types.ReferenceType
+import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.Type
 import net.henryhc.reflekt.elements.types.TypeVariable
 
 /**
@@ -14,13 +15,14 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  */
 class Method(
     val name: String,
-    val returnType: TypeReference,
+    val returnType: TypeReference<out Type>,
     override val modifiers: AccessModifiers,
-    override val declaration: ReferenceType,
-    override val parameterTypes: List<TypeReference>,
+    override val declaration: ClassOrInterfaceType,
+    override val parameterTypes: List<TypeReference<out Type>>,
     override val typeParameters: List<TypeVariable<Method>>
 ) : Invokable, GenericDeclaration<Method>, Member {
-    override fun toString() = buildString {
+
+    override fun toString(): String = buildString {
         append(declaration.toString())
         append("::")
         append(name)
@@ -34,4 +36,32 @@ class Method(
         append("):")
         append(returnType)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as Method
+
+        if (name != other.name) return false
+        if (returnType != other.returnType) return false
+        if (modifiers != other.modifiers) return false
+        if (declaration != other.declaration) return false
+        if (parameterTypes != other.parameterTypes) return false
+        if (typeParameters != other.typeParameters) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + returnType.hashCode()
+        result = 31 * result + modifiers.hashCode()
+        result = 31 * result + declaration.hashCode()
+        result = 31 * result + parameterTypes.hashCode()
+        result = 31 * result + typeParameters.hashCode()
+        return result
+    }
+
+
 }

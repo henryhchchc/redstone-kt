@@ -5,10 +5,9 @@ import kotlin.jvm.JvmInline
 
 /**
  * The access modifiers for JVM elements.
- * @property rawValue The raw [Int] value.
  */
 @JvmInline
-value class AccessModifiers(val rawValue: Int) {
+value class AccessModifiers(private val rawValue: Int) {
 
     /**
      * Combines the [AccessModifiers] with another.
