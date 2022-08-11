@@ -15,4 +15,35 @@ class Field(
     val type: TypeReference<out Type>,
     override val modifiers: AccessModifiers,
     override val declaration: ClassOrInterfaceType
-) : Member
+) : Member {
+
+    override fun toString(): String = buildString {
+        append(declaration.toString())
+        append(".")
+        append(name)
+        append(":")
+        append(type.toString())
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as Field
+
+        if (name != other.name) return false
+        if (type != other.type) return false
+        if (modifiers != other.modifiers) return false
+        if (declaration != other.declaration) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + modifiers.hashCode()
+        result = 31 * result + declaration.hashCode()
+        return result
+    }
+}
