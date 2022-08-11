@@ -7,12 +7,15 @@ import net.henryhc.reflekt.elements.references.materialization.Materialization
 /**
  * Denotes a type in JVM.
  * @property identifier The raw type name.
+ * @property descriptor The JVM descriptor of the type.
  * @see ClassOrInterfaceType
  * @see TypeVariable
  */
 sealed class Type {
 
     abstract val identifier: String
+
+    abstract val descriptor: String
 
     /**
      * Creates a type denoting the type of the array of the current type.

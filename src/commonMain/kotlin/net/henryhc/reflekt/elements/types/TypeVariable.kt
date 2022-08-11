@@ -11,8 +11,10 @@ import net.henryhc.reflekt.elements.references.TypeReference
  */
 class TypeVariable<D : GenericDeclaration<out D>>(
     override val identifier: String,
-    val upperBounds: List<TypeReference<out ReferenceType>>
+    val upperBounds: List<TypeReference<out ReferenceType>> = listOf(ObjectType.makeReference())
 ) : ReferenceType() {
+
+    override val descriptor: String get() = upperBounds.first().type.descriptor
 
     private lateinit var _declaration: D
 

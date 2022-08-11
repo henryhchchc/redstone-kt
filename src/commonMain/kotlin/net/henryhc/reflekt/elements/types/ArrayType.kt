@@ -10,6 +10,8 @@ class ArrayType(val elementType: TypeReference<out Type>) : ReferenceType() {
 
     override val identifier: String get() = "${elementType.type.identifier}[]"
 
+    override val descriptor: String get() = "[${elementType.type.descriptor}"
+
     /**
      * Gets the dimension of the array type.
      */

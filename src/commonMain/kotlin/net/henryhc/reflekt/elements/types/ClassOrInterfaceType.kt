@@ -20,6 +20,8 @@ open class ClassOrInterfaceType(
     val implementedInterfaces: List<TypeReference<out ClassOrInterfaceType>> = emptyList(),
 ) : ReferenceType(), GenericDeclaration<ClassOrInterfaceType> {
 
+    override val descriptor: String get() = "L${identifier.replace(".", "/")};"
+
     override fun toString(): String = buildString {
         append(identifier)
         if (typeParameters.isNotEmpty()) {
