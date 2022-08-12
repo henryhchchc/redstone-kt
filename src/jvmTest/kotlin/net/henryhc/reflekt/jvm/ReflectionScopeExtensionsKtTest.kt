@@ -3,7 +3,7 @@ package net.henryhc.reflekt.jvm
 import net.henryhc.reflekt.ReflectionScope
 import net.henryhc.reflekt.elements.types.ObjectType
 import net.henryhc.reflekt.elements.types.PrimitiveType
-import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.ClassType
 import org.example.ComplicatedType
 import org.example.I3
 import org.example.SimpleType
@@ -29,7 +29,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assertTrue { jvmType.name in scope }
-        val type = scope[jvmType.name] as ClassOrInterfaceType
+        val type = scope[jvmType.name] as ClassType
         assertNotNull(type.superType)
         assertEquals(ObjectType, type.superType?.type)
     }
@@ -41,7 +41,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assertTrue { jvmType.name in scope }
-        val type = scope[jvmType.name] as ClassOrInterfaceType
+        val type = scope[jvmType.name] as ClassType
         assertEquals(1, type.typeParameters.size)
         val tv1 = type.typeParameters.single()
         assertEquals(1, tv1.upperBounds.size)
@@ -59,13 +59,13 @@ internal class ReflectionScopeExtensionsTest {
         assertTrue { complicatedType.name in scope }
         assertTrue { simpleType.name in scope }
 
-        val complicatedClassOrInterfaceType = scope[complicatedType.name] as ClassOrInterfaceType
-        val simpleClassOrInterfaceType = scope[simpleType.name] as ClassOrInterfaceType
+        val complicatedClassType = scope[complicatedType.name] as ClassType
+        val simpleClassType = scope[simpleType.name] as ClassType
 
-        assertNotNull(complicatedClassOrInterfaceType.superType)
-        assertEquals(simpleClassOrInterfaceType, complicatedClassOrInterfaceType.superType?.type)
+        assertNotNull(complicatedClassType.superType)
+        assertEquals(simpleClassType, complicatedClassType.superType?.type)
 
-        assertEquals(2, complicatedClassOrInterfaceType.implementedInterfaces.size)
+        assertEquals(2, complicatedClassType.implementedInterfaces.size)
     }
 
 
@@ -76,7 +76,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assertTrue { jvmType.name in scope }
-        val type = scope[jvmType.name] as ClassOrInterfaceType
+        val type = scope[jvmType.name] as ClassType
         scope.getMethods((type))
             .also { assertTrue { it.isDefined() } }
             .tap { assertEquals(2, it.size) }
@@ -89,7 +89,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assertTrue { jvmType.name in scope }
-        val type = scope[jvmType.name] as ClassOrInterfaceType
+        val type = scope[jvmType.name] as ClassType
         scope.getFields(type)
             .also { assertTrue { it.isDefined() } }
             .tap { assertEquals(1, it.size) }
@@ -102,7 +102,7 @@ internal class ReflectionScopeExtensionsTest {
         scope.addClass(jvmType)
 
         assertTrue { jvmType.name in scope }
-        val type = scope[jvmType.name] as ClassOrInterfaceType
+        val type = scope[jvmType.name] as ClassType
         scope.getConstructors(type)
             .also { assertTrue { it.isDefined() } }
             .tap { assertEquals(1, it.size) }

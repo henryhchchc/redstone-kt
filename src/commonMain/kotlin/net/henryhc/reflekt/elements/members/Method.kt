@@ -4,23 +4,39 @@ import net.henryhc.reflekt.AccessModifiers
 import net.henryhc.reflekt.elements.GenericDeclaration
 import net.henryhc.reflekt.elements.Invokable
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.ClassType
 import net.henryhc.reflekt.elements.types.Type
 import net.henryhc.reflekt.elements.types.TypeVariable
 
 /**
  * Denotes a JVM method.
  * @property name The name of the method.
+ * @property signature The JVM signature of the method.
  * @property returnType The return type of the method.
  */
 class Method(
     val name: String,
     val returnType: TypeReference<out Type>,
     override val modifiers: AccessModifiers,
-    override val declaration: ClassOrInterfaceType,
+    override val declaration: ClassType,
     override val parameterTypes: List<TypeReference<out Type>>,
     override val typeParameters: List<TypeVariable<Method>>
 ) : Invokable, GenericDeclaration<Method>, Member {
+
+    override val signature: String
+        get() = buildString {
+            if (typeParameters.isNotEmpty()) {
+                append(typeParameters.joinToString(separator = "", prefix = "<", postfix = ">") { it.signature })
+            }
+            append(parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")") { it.signature })
+            append(returnType.signature)
+        }
+
+    override val descriptor: String
+        get() = buildString {
+            append(parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")") { it.descriptor })
+            append(returnType.descriptor)
+        }
 
     override fun toString(): String = buildString {
         append(declaration.toString())

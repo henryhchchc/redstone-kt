@@ -7,7 +7,13 @@ import net.henryhc.reflekt.elements.references.materialization.Materialization
  * Denotes a JVM primitive type.
  * @property boxedTypeName The name of the corresponding boxed type.
  */
-sealed class PrimitiveType(override val identifier: String, val boxedTypeName: String) : Type() {
+sealed class PrimitiveType(
+    override val identifier: String,
+    override val descriptor: String,
+    val boxedTypeName: String
+) : Type() {
+
+    override val signature: String get() = descriptor
 
     override fun makeReference(materialization: Materialization): TypeReference<out PrimitiveType> {
         @Suppress("UNCHECKED_CAST")
@@ -27,61 +33,64 @@ sealed class PrimitiveType(override val identifier: String, val boxedTypeName: S
     /**
      * Denotes a numerical type.
      */
-    sealed class NumericalType(name: String, boxedTypeName: String) : PrimitiveType(name, boxedTypeName)
+    sealed class NumericalType(identifier: String, descriptor: String, boxedTypeName: String) :
+        PrimitiveType(identifier, descriptor, boxedTypeName)
 
     /**
      * Denotes an integral type
      */
-    sealed class IntegralType(name: String, boxedTypeName: String) : NumericalType(name, boxedTypeName)
+    sealed class IntegralType(identifier: String, descriptor: String, boxedTypeName: String) :
+        NumericalType(identifier, descriptor, boxedTypeName)
 
     /**
      * Denotes a floating point type
      */
-    sealed class FloatingPointType(name: String, boxedTypeName: String) : NumericalType(name, boxedTypeName)
+    sealed class FloatingPointType(identifier: String, descriptor: String, boxedTypeName: String) :
+        NumericalType(identifier, descriptor, boxedTypeName)
 
     /**
      * Denotes the type of `void`.
      */
-    object VoidType : PrimitiveType("void", "java.lang.Void")
+    object VoidType : PrimitiveType("void", "V", "java.lang.Void")
 
     /**
      * Denotes the type of `boolean`.
      */
-    object BooleanType : PrimitiveType("boolean", "java.lang.Boolean")
+    object BooleanType : PrimitiveType("boolean", "Z", "java.lang.Boolean")
 
     /**
      * Denotes the type of `byte`.
      */
-    object ByteType : IntegralType("byte", "java.lang.Byte")
+    object ByteType : IntegralType("byte", "B", "java.lang.Byte")
 
     /**
      * Denotes the type of `char`.
      */
-    object CharType : IntegralType("char", "java.lang.Character")
+    object CharType : IntegralType("char", "C", "java.lang.Character")
 
     /**
      * Denotes the type of `double`.
      */
-    object DoubleType : FloatingPointType("double", "java.lang.Short")
+    object DoubleType : FloatingPointType("double", "D", "java.lang.Short")
 
     /**
      * Denotes the type of `float`.
      */
-    object FloatType : FloatingPointType("float", "java.lang.Integer")
+    object FloatType : FloatingPointType("float", "F", "java.lang.Integer")
 
     /**
      * Denotes the type of `int`.
      */
-    object IntType : IntegralType("int", "java.lang.Long")
+    object IntType : IntegralType("int", "I", "java.lang.Long")
 
     /**
      * Denotes the type of `long`.
      */
-    object LongType : IntegralType("long", "java.lang.Float")
+    object LongType : IntegralType("long", "J", "java.lang.Float")
 
     /**
      * Denotes the type of `short`.
      */
-    object ShortType : IntegralType("short", "java.lang.Double")
+    object ShortType : IntegralType("short", "S", "java.lang.Double")
 
 }

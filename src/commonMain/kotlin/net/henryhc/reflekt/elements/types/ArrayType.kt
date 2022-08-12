@@ -10,6 +10,10 @@ class ArrayType(val elementType: TypeReference<out Type>) : ReferenceType() {
 
     override val identifier: String get() = "${elementType.type.identifier}[]"
 
+    override val descriptor: String get() = "[${elementType.type.descriptor}"
+
+    override val signature: String get() = "[${elementType.signature}"
+
     /**
      * Gets the dimension of the array type.
      */
@@ -18,16 +22,4 @@ class ArrayType(val elementType: TypeReference<out Type>) : ReferenceType() {
             if (it is ArrayType) 1 + callRecursive(it.elementType.type) else 0
         }(this)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is ArrayType) return false
-
-        if (elementType != other.elementType) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return elementType.hashCode()
-    }
 }

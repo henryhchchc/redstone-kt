@@ -3,7 +3,7 @@ package net.henryhc.reflekt.references
 import net.henryhc.reflekt.elements.references.FixedTypeReference
 import net.henryhc.reflekt.elements.references.materialization.Materialization.Companion.materialize
 import net.henryhc.reflekt.elements.types.ObjectType
-import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.ClassType
 import net.henryhc.reflekt.elements.types.TypeVariable
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,9 +21,9 @@ internal class FixedTypeReferenceTest {
 
     @Test
     fun equalityWithMaterialization() {
-        val tv1 = TypeVariable<ClassOrInterfaceType>("A", listOf(ObjectType.makeReference()))
-        val tv2 = TypeVariable<ClassOrInterfaceType>("B", listOf(ObjectType.makeReference()))
-        val type = ClassOrInterfaceType(
+        val tv1 = TypeVariable<ClassType>("A", listOf(ObjectType.makeReference()))
+        val tv2 = TypeVariable<ClassType>("B", listOf(ObjectType.makeReference()))
+        val type = ClassType(
             identifier = "org.example.Foo",
             superType = ObjectType.makeReference(),
             typeParameters = listOf(tv1, tv2)
@@ -39,9 +39,9 @@ internal class FixedTypeReferenceTest {
 
     @Test
     fun notEqualWithDifferentMaterialization() {
-        val tv1 = TypeVariable<ClassOrInterfaceType>("A", listOf(ObjectType.makeReference()))
-        val tv2 = TypeVariable<ClassOrInterfaceType>("B", listOf(ObjectType.makeReference()))
-        val type = ClassOrInterfaceType(
+        val tv1 = TypeVariable<ClassType>("A", listOf(ObjectType.makeReference()))
+        val tv2 = TypeVariable<ClassType>("B", listOf(ObjectType.makeReference()))
+        val type = ClassType(
             identifier = "org.example.Foo",
             superType = ObjectType.makeReference(),
             typeParameters = listOf(tv1, tv2)
@@ -57,9 +57,9 @@ internal class FixedTypeReferenceTest {
 
     @Test
     fun equalWithIrrelevantMaterialization() {
-        val tv1 = TypeVariable<ClassOrInterfaceType>("A", listOf(ObjectType.makeReference()))
-        val tv2 = TypeVariable<ClassOrInterfaceType>("B", listOf(ObjectType.makeReference()))
-        val type = ClassOrInterfaceType(
+        val tv1 = TypeVariable<ClassType>("A", listOf(ObjectType.makeReference()))
+        val tv2 = TypeVariable<ClassType>("B", listOf(ObjectType.makeReference()))
+        val type = ClassType(
             identifier = "org.example.Foo",
             superType = ObjectType.makeReference(),
             typeParameters = listOf(tv1)
