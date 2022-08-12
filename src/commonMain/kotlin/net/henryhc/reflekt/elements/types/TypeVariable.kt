@@ -16,6 +16,8 @@ class TypeVariable<D : GenericDeclaration<out D>>(
 
     override val descriptor: String get() = upperBounds.first().type.descriptor
 
+    override val signature: String get() = "$identifier${upperBounds.joinToString { ":${it.signature}" }}"
+
     private lateinit var _declaration: D
 
     val declaration: D get() = _declaration

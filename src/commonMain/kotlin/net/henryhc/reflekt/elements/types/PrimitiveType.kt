@@ -13,6 +13,8 @@ sealed class PrimitiveType(
     val boxedTypeName: String
 ) : Type() {
 
+    override val signature: String get() = descriptor
+
     override fun makeReference(materialization: Materialization): TypeReference<out PrimitiveType> {
         @Suppress("UNCHECKED_CAST")
         return super.makeReference(materialization) as TypeReference<out PrimitiveType>

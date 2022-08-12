@@ -2,7 +2,7 @@ package net.henryhc.reflekt.elements.references
 
 import net.henryhc.reflekt.elements.references.materialization.Materialization
 import net.henryhc.reflekt.elements.references.materialization.Materialization.Companion.materialize
-import net.henryhc.reflekt.elements.types.ClassOrInterfaceType
+import net.henryhc.reflekt.elements.types.ClassType
 import net.henryhc.reflekt.elements.types.Type
 import net.henryhc.reflekt.utils.identityHashCode
 
@@ -27,7 +27,7 @@ class DanglingTypeReference<T: Type>(
         require(!this::type.isInitialized) { "The type reference is already bind." }
         @Suppress("UNCHECKED_CAST")
         type = value as T
-        val relevantTypeVariables = if (type is ClassOrInterfaceType) (type as ClassOrInterfaceType).typeParameters else emptyList()
+        val relevantTypeVariables = if (type is ClassType) (type as ClassType).typeParameters else emptyList()
         this.materialization = materialize(materialization.filterKeys { it in relevantTypeVariables })
     }
 

@@ -12,6 +12,8 @@ class ArrayType(val elementType: TypeReference<out Type>) : ReferenceType() {
 
     override val descriptor: String get() = "[${elementType.type.descriptor}"
 
+    override val signature: String get() = error("Array type does not have a signature.")
+
     /**
      * Gets the dimension of the array type.
      */

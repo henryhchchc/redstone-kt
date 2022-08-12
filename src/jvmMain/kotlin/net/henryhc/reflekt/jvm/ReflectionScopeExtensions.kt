@@ -41,8 +41,8 @@ fun ReflectionScope.addClass(jvmClass: JvmClass): Unit = resolveNewTypes {
 
     newJvmTypes.filterIsInstance<JvmTypeVariable>()
         .filter { it.genericDeclaration is JvmType && (it.genericDeclaration as JvmType).qualifiedTypeName !in typesInScope }
-        .associate { it.qualifiedTypeName to resolve<ClassOrInterfaceType>(it) }
-        .also(newlyResolvedTypeVariablesForClassOrInterfaceTypes::putAll)
+        .associate { it.qualifiedTypeName to resolve<ClassType>(it) }
+        .also(newlyResolvedTypeVariablesForClassTypes::putAll)
 
     newJvmTypes.filterIsInstance<JvmTypeVariable>()
         .filter { it.genericDeclaration is JvmMethod && it.genericDeclaration in methods }
@@ -106,7 +106,7 @@ private fun ReflectionScope.ResolutionContext.resolve(f: JvmField) = Field(
     name = f.name,
     type = makeReference(f.genericType),
     modifiers = AccessModifiers(f.modifiers),
-    declaration = findResolvedType(f.declaringClass.qualifiedTypeName) as ClassOrInterfaceType
+    declaration = findResolvedType(f.declaringClass.qualifiedTypeName) as ClassType
 )
 
 private fun ReflectionScope.ResolutionContext.resolve(method: JvmMethod): Method {
@@ -121,7 +121,7 @@ private fun ReflectionScope.ResolutionContext.resolve(method: JvmMethod): Method
         name = method.name,
         returnType = makeReference(method.genericReturnType),
         modifiers = AccessModifiers(method.modifiers),
-        declaration = findResolvedType(method.declaringClass.qualifiedTypeName) as ClassOrInterfaceType,
+        declaration = findResolvedType(method.declaringClass.qualifiedTypeName) as ClassType,
         parameterTypes = method.genericParameterTypes.map { makeReference(it) },
         typeParameters = typeParams
     ).also { gm -> typeParams.forEach { it.bindDeclaration(gm) } }
@@ -129,15 +129,15 @@ private fun ReflectionScope.ResolutionContext.resolve(method: JvmMethod): Method
 
 private fun ReflectionScope.ResolutionContext.resolve(constructor: JvmConstructor) = Constructor(
     modifiers = AccessModifiers(constructor.modifiers),
-    declaration = findResolvedType(constructor.declaringClass.qualifiedTypeName) as ClassOrInterfaceType,
+    declaration = findResolvedType(constructor.declaringClass.qualifiedTypeName) as ClassType,
     parameterTypes = constructor.genericParameterTypes.map { makeReference(it) }
 )
 
-private fun ReflectionScope.ResolutionContext.resolve(jvmClass: JvmClass): ClassOrInterfaceType {
+private fun ReflectionScope.ResolutionContext.resolve(jvmClass: JvmClass): ClassType {
     if (jvmClass.name == "java.lang.Object")
         return ObjectType
     val typeParams = jvmClass.typeParameters.map { findResolvedTypeVariable(jvmClass.qualifiedTypeName, it.name) }
-    return ClassOrInterfaceType(
+    return ClassType(
         identifier = jvmClass.typeName,
         modifiers = AccessModifiers(jvmClass.modifiers),
         typeParameters = typeParams,

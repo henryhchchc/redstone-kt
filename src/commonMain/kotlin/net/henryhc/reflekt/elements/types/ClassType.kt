@@ -12,15 +12,24 @@ import net.henryhc.reflekt.elements.references.materialization.Materialization
  * @property modifiers The access modifiers.
  * @property implementedInterfaces References to the implemented interfaces.
  */
-open class ClassOrInterfaceType(
+open class ClassType(
     override val identifier: String,
     val modifiers: AccessModifiers = ACC_PUBLIC,
-    override val typeParameters: List<TypeVariable<out ClassOrInterfaceType>> = emptyList(),
-    val superType: TypeReference<out ClassOrInterfaceType>?,
-    val implementedInterfaces: List<TypeReference<out ClassOrInterfaceType>> = emptyList(),
-) : ReferenceType(), GenericDeclaration<ClassOrInterfaceType> {
+    override val typeParameters: List<TypeVariable<out ClassType>> = emptyList(),
+    val superType: TypeReference<out ClassType>?,
+    val implementedInterfaces: List<TypeReference<out ClassType>> = emptyList(),
+) : ReferenceType(), GenericDeclaration<ClassType> {
 
     override val descriptor: String get() = "L${identifier.replace(".", "/")};"
+
+    override val signature: String
+        get() = buildString {
+            if (typeParameters.isNotEmpty()) {
+                append(typeParameters.joinToString(separator = "", prefix = "<", postfix = ">") { it.signature })
+            }
+            append(superType?.signature ?: "")
+            append(implementedInterfaces.joinToString(separator = "") { it.signature })
+        }
 
     override fun toString(): String = buildString {
         append(identifier)
@@ -35,7 +44,7 @@ open class ClassOrInterfaceType(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
-        other as ClassOrInterfaceType
+        other as ClassType
 
         return this.toString() == other.toString()
     }
@@ -44,9 +53,9 @@ open class ClassOrInterfaceType(
         return this.toString().hashCode()
     }
 
-    override fun makeReference(materialization: Materialization): TypeReference<out ClassOrInterfaceType> {
+    override fun makeReference(materialization: Materialization): TypeReference<out ClassType> {
         @Suppress("UNCHECKED_CAST")
-        return super.makeReference(materialization) as TypeReference<ClassOrInterfaceType>
+        return super.makeReference(materialization) as TypeReference<ClassType>
     }
 
 }
