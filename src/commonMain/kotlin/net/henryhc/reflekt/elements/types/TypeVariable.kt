@@ -14,7 +14,7 @@ class TypeVariable<D : GenericDeclaration<out D>>(
     val upperBounds: List<TypeReference<out ReferenceType>> = listOf(ObjectType.makeReference())
 ) : ReferenceType() {
 
-    override val descriptor: String get() = upperBounds.first().type.descriptor
+    override val descriptor: String get() = upperBounds.first().descriptor
 
     override val signature: String get() = "$identifier${upperBounds.joinToString { ":${it.signature}" }}"
 
@@ -40,18 +40,15 @@ class TypeVariable<D : GenericDeclaration<out D>>(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as TypeVariable<*>
+        if (other !is TypeVariable<*>) return false
+//        if (!super.equals(other)) return false
 
         if (identifier != other.identifier) return false
 
         return true
     }
 
-    override fun hashCode(): Int {
-        return identifier.hashCode()
-    }
+    override fun hashCode(): Int = identifier.hashCode()
 
 
 }

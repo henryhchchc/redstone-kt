@@ -10,17 +10,7 @@ class WildcardTypeReference(override val type: WildcardType) : TypeReference<Wil
 
     override val materialization: Materialization = Materialization.EMPTY
 
-    override val signature: String
-        get() = buildString {
-            append("<")
-            if (type.upperBounds.isEmpty() && type.lowerBounds.isEmpty())
-                append("*")
-            else {
-                type.upperBounds.forEach { append("+"); append(it.signature) }
-                type.lowerBounds.forEach { append("-"); append(it.signature) }
-            }
-            append(">")
-        }
+    override val signature: String get() = type.signature
 
     override fun toString(): String = type.toString()
 }

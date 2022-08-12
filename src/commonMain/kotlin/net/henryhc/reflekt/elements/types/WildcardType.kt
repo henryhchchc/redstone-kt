@@ -16,7 +16,16 @@ class WildcardType(
 
     override val descriptor: String get() = ""
 
-    override val signature: String get() = error("Wildcard type does not have a signature.")
+    override val signature: String get() = buildString {
+        append("<")
+        if (upperBounds.isEmpty() && lowerBounds.isEmpty())
+            append("*")
+        else {
+            upperBounds.forEach { append("+"); append(it.signature) }
+            lowerBounds.forEach { append("-"); append(it.signature) }
+        }
+        append(">")
+    }
 
     private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single().type == ObjectType
 

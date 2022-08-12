@@ -1,5 +1,6 @@
 package net.henryhc.reflekt.elements.references
 
+import net.henryhc.reflekt.elements.Element
 import net.henryhc.reflekt.elements.references.materialization.Materialization
 import net.henryhc.reflekt.elements.types.*
 
@@ -9,11 +10,13 @@ import net.henryhc.reflekt.elements.types.*
  * @property signature The JVM `ReferenceTypeSignature`.
  * @property materialization Known mapping from the type variables to the actual types.
  */
-abstract class TypeReference<T : Type> {
+abstract class TypeReference<T : Type> : Element {
 
     abstract val type: T
 
-    open val signature: String
+    override val descriptor: String get() = type.descriptor
+
+    override val signature: String
         get() = when (type) {
             is ClassType -> buildString {
                 append("L")
@@ -21,14 +24,14 @@ abstract class TypeReference<T : Type> {
                 val classType = type as ClassType
                 if (classType.typeParameters.isNotEmpty()) {
                     append("<")
-                    classType.typeParameters.mapNotNull { materialization[it] }.forEach { append(it.signature) }
+                    classType.typeParameters.map { materialization[it] }.forEach { append(it?.signature?:"?") }
                     append(">")
                 }
                 append(";")
             }
 
             is TypeVariable<*> -> "T${type.identifier};"
-            is ArrayType -> "[${(type as ArrayType).elementType.signature}"
+            is ArrayType -> type.signature
             is PrimitiveType -> type.descriptor
 
             else -> error("Should not reach here.")
@@ -36,21 +39,6 @@ abstract class TypeReference<T : Type> {
 
     abstract val materialization: Materialization
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TypeReference<*>) return false
-
-        if (type != other.type) return false
-        if (materialization != other.materialization) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = type.hashCode()
-        result = 31 * result + materialization.hashCode()
-        return result
-    }
 
     override fun toString(): String = buildString {
         append(type.identifier)
@@ -62,6 +50,19 @@ abstract class TypeReference<T : Type> {
                     postfix = ">"
                 ) { materialization[it].toString() })
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TypeReference<*>) return false
+
+        if (signature != other.signature) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return signature.hashCode()
     }
 
 }

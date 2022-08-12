@@ -1,6 +1,7 @@
 package net.henryhc.reflekt.elements.members
 
 import net.henryhc.reflekt.AccessModifiers
+import net.henryhc.reflekt.elements.Element
 import net.henryhc.reflekt.elements.types.ClassType
 
 /**
@@ -10,7 +11,7 @@ import net.henryhc.reflekt.elements.types.ClassType
  * @see Field
  * @see Method
  */
-interface Member {
+interface Member : Element {
     val declaration: ClassType
     val modifiers: AccessModifiers
 }

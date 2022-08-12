@@ -17,6 +17,10 @@ class Field(
     override val declaration: ClassType
 ) : Member {
 
+    override val signature: String get() = type.signature
+
+    override val descriptor: String get() = type.descriptor
+
     override fun toString(): String = buildString {
         append(declaration.toString())
         append(".")

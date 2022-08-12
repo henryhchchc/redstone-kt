@@ -9,7 +9,7 @@ import net.henryhc.reflekt.utils.identityHashCode
 /**
  * An implementation of [TypeReference] that can be bind later, which is useful for handling circular dependencies.
  */
-class DanglingTypeReference<T: Type>(
+class DanglingTypeReference<T : Type>(
     materialization: Materialization = Materialization.EMPTY
 ) : TypeReference<T>() {
 
@@ -18,6 +18,8 @@ class DanglingTypeReference<T: Type>(
 
     override lateinit var type: T
         private set
+
+    override val descriptor: String get() = if (!this::type.isInitialized) toString() else super.descriptor
 
     /**
      * Bind the [type] field to an actual type.
@@ -31,7 +33,10 @@ class DanglingTypeReference<T: Type>(
         this.materialization = materialize(materialization.filterKeys { it in relevantTypeVariables })
     }
 
-    override fun toString(): String = if (!this::type.isInitialized) "<Dangling>" else super.toString()
+    override fun toString(): String =
+        if (!this::type.isInitialized) "<Dangling@${identityHashCode()}>" else super.toString()
+
+    override val signature: String get() = if (!this::type.isInitialized) toString() else super.signature
 
     override fun hashCode(): Int {
         if (!this::type.isInitialized)

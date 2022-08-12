@@ -40,19 +40,6 @@ open class ClassType(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as ClassType
-
-        return this.toString() == other.toString()
-    }
-
-    override fun hashCode(): Int {
-        return this.toString().hashCode()
-    }
-
     override fun makeReference(materialization: Materialization): TypeReference<out ClassType> {
         @Suppress("UNCHECKED_CAST")
         return super.makeReference(materialization) as TypeReference<ClassType>
