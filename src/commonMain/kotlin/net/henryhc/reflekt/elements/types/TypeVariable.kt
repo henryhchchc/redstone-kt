@@ -9,9 +9,9 @@ import net.henryhc.reflekt.elements.references.TypeReference
  * @property declaration The declaration the type variable belongs to.
  * @property upperBounds The upperbounds of the type variable.
  */
-class TypeVariable<D : GenericDeclaration<out D>>(
+class TypeVariable<D : GenericDeclaration<D>>(
     override val identifier: String,
-    val upperBounds: List<TypeReference<out ReferenceType>> = listOf(ObjectType.makeReference())
+    val upperBounds: List<TypeReference<ReferenceType>> = listOf(ObjectType.makeReference())
 ) : ReferenceType() {
 
     override val descriptor: String get() = upperBounds.first().descriptor

@@ -8,8 +8,6 @@ import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Member
 import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.*
-import net.henryhc.reflekt.elements.references.materialization.DanglingMaterialization
-import net.henryhc.reflekt.elements.references.materialization.Materialization
 import net.henryhc.reflekt.elements.types.*
 
 
@@ -85,11 +83,11 @@ private inline fun <reified T : Member> List<T>.groupByDeclaration() =
     this.groupBy { it.declaration }.mapValues { (_, v) -> v.toSet() }
 
 private fun ReflectionScope.ResolutionContext.generateMaterialization(jvmType: JvmType) =
-    if (jvmType is JvmParameterizedType)
-        DanglingMaterialization(jvmType.run { (rawType as JvmClass).typeParameters.zip(actualTypeArguments) }
-            .associate { (t, a) -> t.qualifiedTypeName to makeReference(a) }).also(danglingMaterializations::add)
-    else
-        Materialization.EMPTY
+    when (jvmType) {
+        is JvmParameterizedType -> jvmType.actualTypeArguments.map { makeReference(it) }
+        is JvmClass -> jvmType.typeParameters.map { UnknownType.makeReference() }
+        else -> emptyList()
+    }
 
 private inline fun <reified D : GenericDeclaration<D>> ReflectionScope.ResolutionContext.resolve(typeVariable: JvmTypeVariable) =
     TypeVariable<D>(

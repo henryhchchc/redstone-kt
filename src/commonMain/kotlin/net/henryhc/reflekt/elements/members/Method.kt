@@ -16,10 +16,10 @@ import net.henryhc.reflekt.elements.types.TypeVariable
  */
 class Method(
     val name: String,
-    val returnType: TypeReference<out Type>,
+    val returnType: TypeReference<Type>,
     override val modifiers: AccessModifiers,
     override val declaration: ClassType,
-    override val parameterTypes: List<TypeReference<out Type>>,
+    override val parameterTypes: List<TypeReference<Type>>,
     override val typeParameters: List<TypeVariable<Method>>
 ) : Invokable, GenericDeclaration<Method>, Member {
 

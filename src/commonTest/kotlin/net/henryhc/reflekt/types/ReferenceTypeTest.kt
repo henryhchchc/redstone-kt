@@ -1,7 +1,6 @@
 package net.henryhc.reflekt.types
 
 import net.henryhc.reflekt.elements.references.DanglingTypeReference
-import net.henryhc.reflekt.elements.references.materialization.DanglingMaterialization
 import net.henryhc.reflekt.elements.types.ObjectType
 import net.henryhc.reflekt.elements.types.ClassType
 import net.henryhc.reflekt.elements.types.ReferenceType
@@ -16,11 +15,9 @@ internal class ReferenceTypeTest {
 
         // org.example.Foo<B extends Foo<B>>
         val tvBound = DanglingTypeReference<ReferenceType>()
-        val materialization = DanglingMaterialization(mapOf("org.example.Foo->B" to tvBound))
-        val bUpperBound = DanglingTypeReference<TypeVariable<ClassType>>(materialization)
+        val bUpperBound = DanglingTypeReference<TypeVariable<ClassType>>(listOf(tvBound))
         val tv = TypeVariable<ClassType>("B", listOf(bUpperBound))
         tvBound.bind(tv)
-        materialization.bind { tv }
         val type = ClassType(
             identifier = "org.example.Foo",
             superType = ObjectType.makeReference(),

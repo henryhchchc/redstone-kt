@@ -12,7 +12,7 @@ import net.henryhc.reflekt.elements.types.Type
  */
 class Field(
     val name: String,
-    val type: TypeReference<out Type>,
+    val type: TypeReference<Type>,
     override val modifiers: AccessModifiers,
     override val declaration: ClassType
 ) : Member {

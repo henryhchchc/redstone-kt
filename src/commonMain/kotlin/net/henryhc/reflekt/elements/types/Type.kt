@@ -3,7 +3,6 @@ package net.henryhc.reflekt.elements.types
 import net.henryhc.reflekt.elements.Element
 import net.henryhc.reflekt.elements.references.FixedTypeReference
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.references.materialization.Materialization
 
 /**
  * Denotes a type in JVM.
@@ -19,14 +18,14 @@ sealed class Type : Element {
      * Creates a type denoting the type of the array of the current type.
      * @param materialization The materialization of the type parameters.
      */
-    fun makeArrayType(materialization: Materialization = Materialization.EMPTY): ArrayType =
+    fun makeArrayType(materialization: List<TypeReference<ReferenceType>> = emptyList()): ArrayType =
         ArrayType(makeReference(materialization))
 
     /**
      * Creates a reference to the current type.
      * @param materialization The materialization of the type parameters.
      */
-    open fun makeReference(materialization: Materialization = Materialization.EMPTY): TypeReference<out Type> =
+    open fun makeReference(materialization: List<TypeReference<ReferenceType>> = emptyList()): TypeReference<Type> =
         FixedTypeReference(this, materialization)
 
     override fun equals(other: Any?): Boolean {

@@ -5,12 +5,8 @@ import net.henryhc.reflekt.elements.members.Constructor
 import net.henryhc.reflekt.elements.members.Field
 import net.henryhc.reflekt.elements.members.Method
 import net.henryhc.reflekt.elements.references.DanglingTypeReference
-import net.henryhc.reflekt.elements.references.materialization.DanglingMaterialization
-import net.henryhc.reflekt.elements.references.materialization.Materialization
-import net.henryhc.reflekt.elements.types.ClassType
-import net.henryhc.reflekt.elements.types.PrimitiveType
-import net.henryhc.reflekt.elements.types.Type
-import net.henryhc.reflekt.elements.types.TypeVariable
+import net.henryhc.reflekt.elements.references.TypeReference
+import net.henryhc.reflekt.elements.types.*
 
 
 /**
@@ -75,7 +71,7 @@ class ReflectionScope {
         private val block: ResolutionContext.() -> Unit
     ) {
 
-        private val danglingTypeReferences = mutableMapOf<DanglingTypeReference<out Type>, String>()
+        private val danglingTypeReferences = mutableMapOf<DanglingTypeReference<Type>, String>()
         val typesInScope get() = scope.typeMap
 
         val newlyResolvedTypeVariablesForClassTypes = mutableMapOf<String, TypeVariable<ClassType>>()
@@ -89,9 +85,6 @@ class ReflectionScope {
         val newlyResolvedConstructors = mutableMapOf<ClassType, Set<Constructor>>()
 
         val newlyResolvedFields = mutableMapOf<ClassType, Set<Field>>()
-
-        val danglingMaterializations = mutableSetOf<DanglingMaterialization>()
-
 
         private val qualifiedNameRegex =
             "(?<typeName>[\\w.\$]+)(::(?<methodSig>\\w+\\(.*?\\)))?->(?<varName>\\w+)".toRegex()
@@ -120,18 +113,22 @@ class ReflectionScope {
         fun findResolvedType(qualifiedName: String) =
             scope.getTypeByName(qualifiedName).getOrElse { newlyResolvedTypes.getValue(qualifiedName) }
 
-        fun <T: Type> newTypeReference(qualifiedName: String, materialization: Materialization = Materialization.EMPTY) =
+        fun <T : Type> newTypeReference(
+            qualifiedName: String,
+            materialization: List<TypeReference<ReferenceType>> = emptyList()
+        ) =
             DanglingTypeReference<T>(materialization).also { danglingTypeReferences[it] = qualifiedName }
 
         fun newTypeVariableReference(typeName: String, varName: String) =
             DanglingTypeReference<TypeVariable<ClassType>>().also { danglingTypeReferences[it] = "$typeName->$varName" }
 
         fun newTypeVariableReference(typeName: String, methodSig: String, varName: String) =
-            DanglingTypeReference<TypeVariable<Method>>().also { danglingTypeReferences[it] = "$typeName::$methodSig->$varName" }
+            DanglingTypeReference<TypeVariable<Method>>().also {
+                danglingTypeReferences[it] = "$typeName::$methodSig->$varName"
+            }
 
         fun resolve() {
             this.block()
-            danglingMaterializations.forEach { it.bind { tv -> findTypeVariable(tv) } }
             danglingTypeReferences.forEach { (r, t) ->
                 if (t.contains("->")) {
                     r.bind(findTypeVariable(t))

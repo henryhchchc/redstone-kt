@@ -1,7 +1,6 @@
 package net.henryhc.reflekt.elements.types
 
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.references.materialization.Materialization
 
 /**
  * Denotes a JVM primitive type.
@@ -15,9 +14,10 @@ sealed class PrimitiveType(
 
     override val signature: String get() = descriptor
 
-    override fun makeReference(materialization: Materialization): TypeReference<out PrimitiveType> {
+    override fun makeReference(materialization: List<TypeReference<ReferenceType>>): TypeReference<PrimitiveType> {
+        require(materialization.isEmpty())
         @Suppress("UNCHECKED_CAST")
-        return super.makeReference(materialization) as TypeReference<out PrimitiveType>
+        return super.makeReference(materialization) as TypeReference<PrimitiveType>
     }
 
     override fun toString(): String = identifier

@@ -1,6 +1,6 @@
 package net.henryhc.reflekt.elements.references
 
-import net.henryhc.reflekt.elements.references.materialization.Materialization
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.WildcardType
 
 /**
@@ -8,7 +8,7 @@ import net.henryhc.reflekt.elements.types.WildcardType
  */
 class WildcardTypeReference(override val type: WildcardType) : TypeReference<WildcardType>() {
 
-    override val materialization: Materialization = Materialization.EMPTY
+    override val materialization: List<TypeReference<ReferenceType>> = emptyList()
 
     override val signature: String get() = type.signature
 
