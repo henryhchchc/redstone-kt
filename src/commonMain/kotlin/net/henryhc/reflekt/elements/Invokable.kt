@@ -8,6 +8,6 @@ import net.henryhc.reflekt.elements.types.Type
  * @property parameterTypes The types of its parameters.
  */
 interface Invokable : Element {
-    val parameterTypes: List<TypeReference<out Type>>
+    val parameterTypes: List<TypeReference<Type>>
 }
 

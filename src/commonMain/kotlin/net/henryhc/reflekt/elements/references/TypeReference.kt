@@ -1,7 +1,6 @@
 package net.henryhc.reflekt.elements.references
 
 import net.henryhc.reflekt.elements.Element
-import net.henryhc.reflekt.elements.references.materialization.Materialization
 import net.henryhc.reflekt.elements.types.*
 
 /**
@@ -10,7 +9,7 @@ import net.henryhc.reflekt.elements.types.*
  * @property signature The JVM `ReferenceTypeSignature`.
  * @property materialization Known mapping from the type variables to the actual types.
  */
-abstract class TypeReference<T : Type> : Element {
+abstract class TypeReference<out T : Type> : Element {
 
     abstract val type: T
 
@@ -23,9 +22,8 @@ abstract class TypeReference<T : Type> : Element {
                 append(type.identifier.replace(".", "/"))
                 val classType = type as ClassType
                 if (classType.typeParameters.isNotEmpty()) {
-                    append("<")
-                    classType.typeParameters.map { materialization[it] }.forEach { append(it?.signature?:"?") }
-                    append(">")
+                    materialization.joinToString(separator = "", prefix = "<", postfix = ">") { it.signature }
+                        .also(::append)
                 }
                 append(";")
             }
@@ -33,22 +31,19 @@ abstract class TypeReference<T : Type> : Element {
             is TypeVariable<*> -> "T${type.identifier};"
             is ArrayType -> type.signature
             is PrimitiveType -> type.descriptor
+            is UnknownType -> UnknownType.signature
 
             else -> error("Should not reach here.")
         }
 
-    abstract val materialization: Materialization
+    abstract val materialization: List<TypeReference<ReferenceType>>
 
 
     override fun toString(): String = buildString {
         append(type.identifier)
         if (materialization.isNotEmpty()) {
-            append(
-                (type as ClassType).typeParameters.joinToString(
-                    separator = ",",
-                    prefix = "<",
-                    postfix = ">"
-                ) { materialization[it].toString() })
+            (type as ClassType).typeParameters.zip(materialization)
+                .joinToString(separator = ",", prefix = "<", postfix = ">") { (tp, ta) -> "$tp = $ta" }.also(::append)
         }
     }
 

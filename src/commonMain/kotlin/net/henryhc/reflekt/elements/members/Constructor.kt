@@ -13,7 +13,7 @@ import net.henryhc.reflekt.elements.types.Type
 class Constructor(
     override val modifiers: AccessModifiers,
     override val declaration: ClassType,
-    override val parameterTypes: List<TypeReference<out Type>>,
+    override val parameterTypes: List<TypeReference<Type>>,
 ) : Invokable, Member {
 
     override val signature: String

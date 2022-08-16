@@ -6,7 +6,7 @@ import net.henryhc.reflekt.elements.references.TypeReference
  * Denotes an array type.
  * @property elementType The type of its elements
  */
-class ArrayType(val elementType: TypeReference<out Type>) : ReferenceType() {
+class ArrayType(val elementType: TypeReference<Type>) : ReferenceType() {
 
     override val identifier: String get() = "${elementType.type.identifier}[]"
 

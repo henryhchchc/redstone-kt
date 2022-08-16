@@ -1,22 +1,17 @@
 package net.henryhc.reflekt.elements.references
 
-import net.henryhc.reflekt.elements.references.materialization.Materialization
-import net.henryhc.reflekt.elements.references.materialization.Materialization.Companion.materialize
-import net.henryhc.reflekt.elements.types.ClassType
+import net.henryhc.reflekt.elements.types.ReferenceType
 import net.henryhc.reflekt.elements.types.Type
 import net.henryhc.reflekt.utils.identityHashCode
 
 /**
  * An implementation of [TypeReference] that can be bind later, which is useful for handling circular dependencies.
  */
-class DanglingTypeReference<T : Type>(
-    materialization: Materialization = Materialization.EMPTY
+class DanglingTypeReference<out T : Type>(
+    override val materialization: List<TypeReference<ReferenceType>> = emptyList()
 ) : TypeReference<T>() {
 
-    override var materialization: Materialization = materialization
-        private set
-
-    override lateinit var type: T
+    override lateinit var type: @UnsafeVariance T
         private set
 
     override val descriptor: String get() = if (!this::type.isInitialized) toString() else super.descriptor
@@ -29,8 +24,6 @@ class DanglingTypeReference<T : Type>(
         require(!this::type.isInitialized) { "The type reference is already bind." }
         @Suppress("UNCHECKED_CAST")
         type = value as T
-        val relevantTypeVariables = if (type is ClassType) (type as ClassType).typeParameters else emptyList()
-        this.materialization = materialize(materialization.filterKeys { it in relevantTypeVariables })
     }
 
     override fun toString(): String =

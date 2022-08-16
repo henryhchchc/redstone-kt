@@ -4,7 +4,6 @@ import net.henryhc.reflekt.AccessModifiers
 import net.henryhc.reflekt.AccessModifiers.Known.ACC_PUBLIC
 import net.henryhc.reflekt.elements.GenericDeclaration
 import net.henryhc.reflekt.elements.references.TypeReference
-import net.henryhc.reflekt.elements.references.materialization.Materialization
 
 /**
  * Denotes a JVM type with type parameters.
@@ -16,8 +15,8 @@ open class ClassType(
     override val identifier: String,
     val modifiers: AccessModifiers = ACC_PUBLIC,
     override val typeParameters: List<TypeVariable<out ClassType>> = emptyList(),
-    val superType: TypeReference<out ClassType>?,
-    val implementedInterfaces: List<TypeReference<out ClassType>> = emptyList(),
+    val superType: TypeReference<ClassType>?,
+    val implementedInterfaces: List<TypeReference<ClassType>> = emptyList(),
 ) : ReferenceType(), GenericDeclaration<ClassType> {
 
     override val descriptor: String get() = "L${identifier.replace(".", "/")};"
@@ -40,7 +39,8 @@ open class ClassType(
         }
     }
 
-    override fun makeReference(materialization: Materialization): TypeReference<out ClassType> {
+    override fun makeReference(materialization: List<TypeReference<ReferenceType>>): TypeReference<ClassType> {
+        require(materialization.size == typeParameters.size)
         @Suppress("UNCHECKED_CAST")
         return super.makeReference(materialization) as TypeReference<ClassType>
     }
