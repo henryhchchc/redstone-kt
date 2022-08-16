@@ -42,8 +42,7 @@ abstract class TypeReference<out T : Type> : Element {
     override fun toString(): String = buildString {
         append(type.identifier)
         if (materialization.isNotEmpty()) {
-            (type as ClassType).typeParameters.zip(materialization)
-                .joinToString(separator = ",", prefix = "<", postfix = ">") { (tp, ta) -> "$tp = $ta" }.also(::append)
+            materialization.joinToString(separator = ",", prefix = "<", postfix = ">").also(::append)
         }
     }
 
