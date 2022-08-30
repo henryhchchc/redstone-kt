@@ -10,7 +10,7 @@ import okio.Path.Companion.toPath
 /**
  * A JDK environment containing java executable and compiler.
  */
-class UnixJDKEnvironment(
+class POSIXJDKEnvironment(
     override val javaHome: Path
 ) : JDKEnvironment {
 
@@ -32,7 +32,7 @@ class UnixJDKEnvironment(
     ): JDKEnvironment.ExecutionResult {
         val args = buildList {
             add(javaCompilerExecutable.toString())
-            add("-classpath"); add(classPath.joinToString(":"))
+            add("-classpath"); add(classPath.joinToString(CLASS_PATH_SEPARATOR))
             add("-d"); add(outputDirectory.toString())
             add("-sourcepath"); add(sourceDirectory.toString())
             add("-source"); add(sourceVersion.toString())
@@ -83,6 +83,8 @@ class UnixJDKEnvironment(
          * The JAVA_HOME directory of the running JVM.
          */
         val CURRENT_JAVA_HOME = System.getProperty("java.home").toPath()
+
+        private const val CLASS_PATH_SEPARATOR: String = ";"
     }
 
 }

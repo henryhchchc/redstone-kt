@@ -8,25 +8,25 @@ import okio.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class UnixJDKEnvironmentTest : FileSystemContext {
+internal class POSIXJDKEnvironmentTest : FileSystemContext {
 
     override val fileSystem = FileSystem.SYSTEM
 
     @Test
     fun testGetJavaExecutable() {
-        val jdkEnv = UnixJDKEnvironment(UnixJDKEnvironment.CURRENT_JAVA_HOME)
+        val jdkEnv = POSIXJDKEnvironment(POSIXJDKEnvironment.CURRENT_JAVA_HOME)
         assert(jdkEnv.javaExecutable.name == "java")
     }
 
     @Test
     fun testGetJavaCompileExecutable() {
-        val jdkEnv = UnixJDKEnvironment(UnixJDKEnvironment.CURRENT_JAVA_HOME)
+        val jdkEnv = POSIXJDKEnvironment(POSIXJDKEnvironment.CURRENT_JAVA_HOME)
         assert(jdkEnv.javaCompilerExecutable.name == "javac")
     }
 
     @Test
     fun testCompile(): Unit = runBlocking {
-        val jdkEnv = UnixJDKEnvironment(UnixJDKEnvironment.CURRENT_JAVA_HOME)
+        val jdkEnv = POSIXJDKEnvironment(POSIXJDKEnvironment.CURRENT_JAVA_HOME)
         TemporaryDirectory().use { tempDir ->
             createCompilationSubjects(tempDir)
             val result = jdkEnv.runJavaCompiler(
