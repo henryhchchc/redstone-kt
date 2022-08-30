@@ -83,7 +83,12 @@ kotlin {
                 implementation("io.mockk:mockk:1.12.7")
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependencies {
+                implementation("org.ow2.asm:asm:9.3")
+                implementation("org.ow2.asm:asm-tree:9.3")
+            }
+        }
         val jvmTest by getting
 //        val nativeMain by getting
 //        val nativeTest by getting
