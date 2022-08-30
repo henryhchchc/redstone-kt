@@ -2,6 +2,7 @@
 
 plugins {
     kotlin("multiplatform") version "1.7.20-Beta"
+    kotlin("plugin.serialization") version "1.7.20-Beta"
 }
 
 group = "net.henryhc"
@@ -64,8 +65,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("io.arrow-kt:arrow-core:1.1.2")
+                implementation("io.arrow-kt:arrow-fx-coroutines:1.1.2")
+                implementation("io.arrow-kt:arrow-fx-stm:1.1.2")
+                implementation("com.github.ajalt.clikt:clikt:3.5.0")
                 implementation("com.squareup.okio:okio:3.2.0")
+                implementation("io.github.microutils:kotlin-logging:2.1.23")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-okio:1.4.0")
             }
         }
         val commonTest by getting {

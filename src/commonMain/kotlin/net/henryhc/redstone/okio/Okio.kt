@@ -31,3 +31,27 @@ inline fun <reified R> TemporaryDirectory.use(fileSystem: FileSystem, block: (Pa
 
 }
 
+/**
+ * Gets the file name extension.
+ */
+val Path.extension get() = this.name.substringAfterLast('.', "")
+
+/**
+ * Recursive copies the contents from [source] to [destination].
+ * @param source The source directory.
+ * @param destination The destination directory. It will be created if not exist.
+ */
+fun FileSystem.copyRecursively(source: Path, destination: Path) {
+    require(metadataOrNull(source)?.isDirectory == true) { "$source must be a directory." }
+    require(metadataOrNull(destination)?.isDirectory != false) { "$destination must be a directory." }
+
+    createDirectories(destination)
+    listRecursively(source).sortedBy { it.segments.size }.forEach {
+        val meta = metadata(it)
+        when {
+            meta.isRegularFile -> copy(it, destination / it.relativeTo(source))
+            meta.isDirectory -> createDirectory(destination / it.relativeTo(source))
+            meta.symlinkTarget != null -> createSymlink(it.relativeTo(source), meta.symlinkTarget!!)
+        }
+    }
+}
