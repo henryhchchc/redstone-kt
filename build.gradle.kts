@@ -19,7 +19,8 @@ kotlin {
                 freeCompilerArgs = freeCompilerArgs + listOf(
                     "-opt-in=kotlin.RequiresOptIn",
                     "-Xextended-compiler-checks",
-//                    "-Xuse-k2"
+//                    "-Xcontext-receivers",
+//                    "-Xuse-k2",
                 )
             }
         }
@@ -31,6 +32,7 @@ kotlin {
                 jvmTarget = "11"
                 freeCompilerArgs = freeCompilerArgs + listOf(
                     "-Xbackend-threads=0",
+                    "-Xcontext-receivers",
                 )
             }
         }
@@ -40,39 +42,42 @@ kotlin {
         }
     }
 
-    val hostOs = System.getProperty("os.name")
-    val arch = System.getProperty("os.arch")
-    val nativeTargetName = "native"
-    val nativeTarget = when (hostOs) {
-        "Mac OS X" -> when (arch) {
-            "aarch64" -> macosArm64(nativeTargetName)
-            "x86_64" -> macosX64(nativeTargetName)
-            else -> throw GradleException("Architecture $arch is not supported on macOS")
-        }
-
-        "Linux" -> when (arch) {
-            "aarch64" -> linuxArm64(nativeTargetName)
-            "amd64" -> linuxX64(nativeTargetName)
-            else -> throw GradleException("Architecture $arch is not supported on Linux")
-        }
-
-        else -> throw GradleException("Host OS is not supported.")
-    }
+//    val hostOs = System.getProperty("os.name")
+//    val arch = System.getProperty("os.arch")
+//    val nativeTargetName = "native"
+//    val nativeTarget = when (hostOs) {
+//        "Mac OS X" -> when (arch) {
+//            "aarch64" -> macosArm64(nativeTargetName)
+//            "x86_64" -> macosX64(nativeTargetName)
+//            else -> throw GradleException("Architecture $arch is not supported on macOS")
+//        }
+//
+//        "Linux" -> when (arch) {
+//            "aarch64" -> linuxArm64(nativeTargetName)
+//            "amd64" -> linuxX64(nativeTargetName)
+//            else -> throw GradleException("Architecture $arch is not supported on Linux")
+//        }
+//
+//        else -> throw GradleException("Host OS is not supported.")
+//    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation("io.arrow-kt:arrow-core:1.1.2")
+                implementation("com.squareup.okio:okio:3.2.0")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
+                implementation("io.mockk:mockk:1.12.7")
             }
         }
         val jvmMain by getting
         val jvmTest by getting
-        val nativeMain by getting
-        val nativeTest by getting
+//        val nativeMain by getting
+//        val nativeTest by getting
     }
 }
