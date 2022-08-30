@@ -4,7 +4,7 @@ plugins {
     kotlin("multiplatform") version "1.7.20-Beta"
 }
 
-group = "net.henryhc"
+group = "net.henryhc.redstone"
 version = "1.0-SNAPSHOT"
 
 repositories {

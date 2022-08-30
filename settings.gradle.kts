@@ -1,1 +1,1 @@
-rootProject.name = "reflekt"
+rootProject.name = "redstone"
