@@ -10,7 +10,7 @@ import okio.Path.Companion.toPath
 /**
  * A JDK environment containing java executable and compiler.
  */
-class POSIXJDKEnvironment(
+class PosixJDKEnvironment(
     override val javaHome: Path
 ) : JDKEnvironment {
 
