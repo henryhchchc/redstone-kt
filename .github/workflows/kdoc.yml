@@ -26,6 +26,7 @@ jobs:
       - name: Generate KDoc
         uses: gradle/gradle-build-action@v2
         with:
+          arguments: dokkaHtml
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@1
         with:
