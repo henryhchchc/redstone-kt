@@ -21,7 +21,7 @@ class Constructor(
 
     override val descriptor: String
         get() = buildString {
-            append(parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")") { it.descriptor })
+            parameterTypes.joinTo(this, separator = "", prefix = "(", postfix = ")") { it.descriptor }
             append(PrimitiveType.VoidType.descriptor)
         }
 
@@ -29,7 +29,7 @@ class Constructor(
         append(declaration.toString())
         append("::<init>")
         append('(')
-        append(parameterTypes.joinToString(", "))
+        parameterTypes.joinTo(this, ", ", prefix = "(", postfix = ")")
         append(")")
     }
 

@@ -26,15 +26,15 @@ class Method(
     override val signature: String
         get() = buildString {
             if (typeParameters.isNotEmpty()) {
-                append(typeParameters.joinToString(separator = "", prefix = "<", postfix = ">") { it.signature })
+                typeParameters.joinTo(this, separator = "", prefix = "<", postfix = ">") { it.signature }
             }
-            append(parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")") { it.signature })
+            parameterTypes.joinTo(this, separator = "", prefix = "(", postfix = ")") { it.signature }
             append(returnType.signature)
         }
 
     override val descriptor: String
         get() = buildString {
-            append(parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")") { it.descriptor })
+            parameterTypes.joinTo(this, separator = "", prefix = "(", postfix = ")") { it.descriptor }
             append(returnType.descriptor)
         }
 
@@ -43,13 +43,10 @@ class Method(
         append("::")
         append(name)
         if (typeParameters.isNotEmpty()) {
-            append('<')
-            append(typeParameters.joinToString(", "))
-            append('>')
+            typeParameters.joinTo(this, ", ", prefix = "(", postfix = ")")
         }
-        append('(')
-        append(parameterTypes.joinToString(", "))
-        append("):")
+        parameterTypes.joinTo(this, ", ", prefix = "(", postfix = ")")
+        append(": ")
         append(returnType)
     }
 

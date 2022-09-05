@@ -24,18 +24,16 @@ open class ClassType(
     override val signature: String
         get() = buildString {
             if (typeParameters.isNotEmpty()) {
-                append(typeParameters.joinToString(separator = "", prefix = "<", postfix = ">") { it.signature })
+                typeParameters.joinTo(this, separator = "", prefix = "<", postfix = ">") { it.signature }
             }
             append(superType?.signature ?: "")
-            append(implementedInterfaces.joinToString(separator = "") { it.signature })
+            implementedInterfaces.joinTo(this, separator = "") { it.signature }
         }
 
     override fun toString(): String = buildString {
         append(identifier)
         if (typeParameters.isNotEmpty()) {
-            append('<')
-            append(typeParameters.joinToString(", "))
-            append('>')
+            typeParameters.joinTo(this, separator = ", ", prefix = "<", postfix = ">")
         }
     }
 

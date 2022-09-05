@@ -16,28 +16,27 @@ class WildcardType(
 
     override val descriptor: String get() = ""
 
-    override val signature: String get() = buildString {
-        append("<")
-        if (upperBounds.isEmpty() && lowerBounds.isEmpty())
-            append("*")
-        else {
-            upperBounds.forEach { append("+"); append(it.signature) }
-            lowerBounds.forEach { append("-"); append(it.signature) }
+    override val signature: String
+        get() = buildString {
+            append("<")
+            if (upperBounds.isEmpty() && lowerBounds.isEmpty())
+                append("*")
+            else {
+                upperBounds.forEach { append("+"); append(it.signature) }
+                lowerBounds.forEach { append("-"); append(it.signature) }
+            }
+            append(">")
         }
-        append(">")
-    }
 
     private fun isImplicitUpperbound() = upperBounds.size == 1 && upperBounds.single().type == ObjectType
 
     override fun toString(): String = buildString {
         append('?')
         if (upperBounds.isNotEmpty() && !isImplicitUpperbound()) {
-            append(" extends ")
-            append(upperBounds.joinToString(", "))
+            upperBounds.joinTo(this, ", ", prefix = " extends ")
         }
         if (lowerBounds.isNotEmpty()) {
-            append(" super ")
-            append(lowerBounds.joinToString(", "))
+            lowerBounds.joinTo(this, ", ", prefix = " super ")
         }
     }
 

@@ -35,7 +35,7 @@ class TypeVariable<D : GenericDeclaration<D>>(
     override fun toString(): String = buildString {
         append(identifier)
         if (upperBounds.isNotEmpty())
-            append(upperBounds.joinToString(" & ", prefix = ": "))
+            upperBounds.joinTo(this, " & ", prefix = ": ")
     }
 
     override fun equals(other: Any?): Boolean {
