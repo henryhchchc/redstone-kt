@@ -1,8 +1,10 @@
 @file:Suppress("UNUSED_VARIABLE")
+import java.net.URL
 
 plugins {
     kotlin("multiplatform") version "1.7.20-Beta"
     kotlin("plugin.serialization") version "1.7.20-Beta"
+    id("org.jetbrains.dokka") version "1.7.10"
 }
 
 group = "net.henryhc"
@@ -93,5 +95,17 @@ kotlin {
         val jvmTest by getting
 //        val nativeMain by getting
 //        val nativeTest by getting
+    }
+}
+
+tasks.dokkaHtml {
+    dokkaSourceSets.configureEach {
+        moduleName.set("Project Redstone")
+        jdkVersion.set(11)
+        sourceLink {
+            localDirectory.set(file("src"))
+            remoteUrl.set(URL("https://github.com/henryhchchc/redstone/tree/main/src"))
+            remoteLineSuffix.set("#L")
+        }
     }
 }
