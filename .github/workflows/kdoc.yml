@@ -7,16 +7,12 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+  deployments: write
 
 jobs:
   update_kdoc:
     name: Generate KDoc
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -30,12 +26,11 @@ jobs:
       - name: Generate KDoc
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: dokkaHtml
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Upload KDoc
-        uses: actions/upload-pages-artifact@v1
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@1
         with:
-          path: ./build/dokka/html
-      - name: Deploy KDoc to GitHub Pages
-        uses: actions/deploy-pages@v1
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PAGE_PROJECT }}
+          directory: ./build/dokka/html
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
