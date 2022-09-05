@@ -17,7 +17,7 @@ import net.henryhc.redstone.reflection.elements.types.TypeVariable
 class Method(
     val name: String,
     val returnType: TypeReference<Type>,
-    override val modifiers: net.henryhc.redstone.reflection.AccessModifiers,
+    override val modifiers: AccessModifiers,
     override val declaration: ClassType,
     override val parameterTypes: List<TypeReference<Type>>,
     override val typeParameters: List<TypeVariable<Method>>

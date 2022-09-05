@@ -13,7 +13,7 @@ import net.henryhc.redstone.reflection.elements.types.Type
 class Field(
     val name: String,
     val type: TypeReference<Type>,
-    override val modifiers: net.henryhc.redstone.reflection.AccessModifiers,
+    override val modifiers: AccessModifiers,
     override val declaration: ClassType
 ) : Member {
 

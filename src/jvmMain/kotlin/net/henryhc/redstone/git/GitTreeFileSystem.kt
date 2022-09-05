@@ -1,6 +1,6 @@
 package net.henryhc.redstone.git
 
-import net.henryhc.redstone.useIf
+import net.henryhc.redstone.jvm.useIf
 import okio.*
 import okio.Path.Companion.toPath
 import okio.internal.commonToUtf8String
@@ -13,6 +13,7 @@ import org.eclipse.jgit.treewalk.TreeWalk
 /**
  * A readonly file system implementation for a Git tree.
  */
+@Suppress("KDocMissingDocumentation")
 class GitTreeFileSystem(
     private val repository: Repository,
     private val tree: RevTree
@@ -58,17 +59,15 @@ class GitTreeFileSystem(
 
     override fun sink(file: Path, mustCreate: Boolean): Sink = throw IOException(READ_ONLY_MSG)
 
-    override fun source(file: Path): Source = tree.openReader(canonicalize(file))?.openStream()?.source()
+    override fun source(file: Path): Source = openReader(canonicalize(file))?.openStream()?.source()
         ?: throw IOException("$file not found.")
 
-    private fun treeWalkTo(path: Path): TreeWalk? = if (path.isRoot) TreeWalk(repository).apply { addTree(tree) }
-    else TreeWalk.forPath(repository, path.toString(), tree)
+    private fun treeWalkTo(path: Path): TreeWalk? =
+        if (path.isRoot) TreeWalk(repository).apply { addTree(tree) }
+        else TreeWalk.forPath(repository, path.toString(), tree)
 
-    private fun RevTree.openReader(file: Path): ObjectLoader? = TreeWalk.forPath(
-        repository,
-        file.toString(),
-        this@openReader
-    )?.use { repository.open(it.getObjectId(0))!! }
+    private fun openReader(file: Path): ObjectLoader? =
+        TreeWalk.forPath(repository, file.toString(), tree)?.use { repository.open(it.getObjectId(0))!! }
 
     private fun TreeWalk.descent() = TreeWalk(repository).apply { addTree(this@descent.getObjectId(0)) }
 

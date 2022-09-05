@@ -11,7 +11,7 @@ import net.henryhc.redstone.reflection.elements.types.Type
  * Denotes a JVM constructor.
  */
 class Constructor(
-    override val modifiers: net.henryhc.redstone.reflection.AccessModifiers,
+    override val modifiers: AccessModifiers,
     override val declaration: ClassType,
     override val parameterTypes: List<TypeReference<Type>>,
 ) : Invokable, Member {

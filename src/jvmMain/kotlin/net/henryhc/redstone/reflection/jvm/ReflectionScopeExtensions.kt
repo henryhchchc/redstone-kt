@@ -103,7 +103,7 @@ private fun ReflectionScope.ResolutionContext.resolve(jvmType: JvmWildcardType) 
 private fun ReflectionScope.ResolutionContext.resolve(f: JvmField) = Field(
     name = f.name,
     type = makeReference(f.genericType),
-    modifiers = net.henryhc.redstone.reflection.AccessModifiers(f.modifiers),
+    modifiers = AccessModifiers(f.modifiers),
     declaration = findResolvedType(f.declaringClass.qualifiedTypeName) as ClassType
 )
 
@@ -118,7 +118,7 @@ private fun ReflectionScope.ResolutionContext.resolve(method: JvmMethod): Method
     return Method(
         name = method.name,
         returnType = makeReference(method.genericReturnType),
-        modifiers = net.henryhc.redstone.reflection.AccessModifiers(method.modifiers),
+        modifiers = AccessModifiers(method.modifiers),
         declaration = findResolvedType(method.declaringClass.qualifiedTypeName) as ClassType,
         parameterTypes = method.genericParameterTypes.map { makeReference(it) },
         typeParameters = typeParams
@@ -126,7 +126,7 @@ private fun ReflectionScope.ResolutionContext.resolve(method: JvmMethod): Method
 }
 
 private fun ReflectionScope.ResolutionContext.resolve(constructor: JvmConstructor) = Constructor(
-    modifiers = net.henryhc.redstone.reflection.AccessModifiers(constructor.modifiers),
+    modifiers = AccessModifiers(constructor.modifiers),
     declaration = findResolvedType(constructor.declaringClass.qualifiedTypeName) as ClassType,
     parameterTypes = constructor.genericParameterTypes.map { makeReference(it) }
 )
@@ -137,7 +137,7 @@ private fun ReflectionScope.ResolutionContext.resolve(jvmClass: JvmClass): Class
     val typeParams = jvmClass.typeParameters.map { findResolvedTypeVariable(jvmClass.qualifiedTypeName, it.name) }
     return ClassType(
         identifier = jvmClass.typeName,
-        modifiers = net.henryhc.redstone.reflection.AccessModifiers(jvmClass.modifiers),
+        modifiers = AccessModifiers(jvmClass.modifiers),
         typeParameters = typeParams,
         superType = (jvmClass.genericSuperclass ?: jvmClass.superclass)?.let { makeReference(it) },
         implementedInterfaces = jvmClass.genericInterfaces.map { makeReference(it) })

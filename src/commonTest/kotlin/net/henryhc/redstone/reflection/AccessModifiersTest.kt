@@ -10,22 +10,14 @@ internal class AccessModifiersTest {
     @Test
     fun testCombination() {
         assertEquals(
-            net.henryhc.redstone.reflection.AccessModifiers(7),
-            net.henryhc.redstone.reflection.AccessModifiers(1) and net.henryhc.redstone.reflection.AccessModifiers(2) and net.henryhc.redstone.reflection.AccessModifiers(
-                4
-            )
+            AccessModifiers(7),
+            AccessModifiers(1) and AccessModifiers(2) and AccessModifiers(4)
         )
     }
 
     @Test
     fun testContains() {
-        assertTrue { net.henryhc.redstone.reflection.AccessModifiers(1) in net.henryhc.redstone.reflection.AccessModifiers(
-            7
-        )
-        }
-        assertTrue { net.henryhc.redstone.reflection.AccessModifiers(1) !in net.henryhc.redstone.reflection.AccessModifiers(
-            8
-        )
-        }
+        assertTrue { AccessModifiers(1) in AccessModifiers(7) }
+        assertTrue { AccessModifiers(1) !in AccessModifiers(8) }
     }
 }

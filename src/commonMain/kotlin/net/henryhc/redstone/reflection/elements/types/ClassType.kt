@@ -13,7 +13,7 @@ import net.henryhc.redstone.reflection.elements.references.TypeReference
  */
 open class ClassType(
     override val identifier: String,
-    val modifiers: net.henryhc.redstone.reflection.AccessModifiers = ACC_PUBLIC,
+    val modifiers: AccessModifiers = ACC_PUBLIC,
     override val typeParameters: List<TypeVariable<out ClassType>> = emptyList(),
     val superType: TypeReference<ClassType>?,
     val implementedInterfaces: List<TypeReference<ClassType>> = emptyList(),

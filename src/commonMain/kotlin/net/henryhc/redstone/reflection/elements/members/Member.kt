@@ -13,5 +13,5 @@ import net.henryhc.redstone.reflection.elements.types.ClassType
  */
 interface Member : Element {
     val declaration: ClassType
-    val modifiers: net.henryhc.redstone.reflection.AccessModifiers
+    val modifiers: AccessModifiers
 }
