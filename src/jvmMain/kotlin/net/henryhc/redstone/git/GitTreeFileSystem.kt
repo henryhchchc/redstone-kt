@@ -32,11 +32,11 @@ class GitTreeFileSystem(
 
     override fun list(dir: Path): List<Path> = listOrNull(dir) ?: throw IOException("$dir is not a directory.")
 
-    override fun listOrNull(dir: Path): List<Path>? = tree.walkTo(dir)?.let { tw ->
+    override fun listOrNull(dir: Path): List<Path>? = treeWalkTo(canonicalize(dir))?.let { tw ->
         if (dir.isRoot) tw else tw.useIf({ it.getFileMode(0) == FileMode.TREE }) { it.descent() }
     }?.use { dw -> buildList { while (dw.next()) add(dir.resolve(dw.pathString)) } }
 
-    override fun metadataOrNull(path: Path): FileMetadata? = tree.walkTo(path)?.use { tw ->
+    override fun metadataOrNull(path: Path): FileMetadata? = treeWalkTo(canonicalize(path))?.use { tw ->
         val fileMode = tw.getFileMode(0)
         val loader = repository.open(tw.getObjectId(0))
         val symLinkTarget = loader.takeIf { fileMode == FileMode.SYMLINK }?.openStream()?.use {
@@ -58,30 +58,19 @@ class GitTreeFileSystem(
 
     override fun sink(file: Path, mustCreate: Boolean): Sink = throw IOException(READ_ONLY_MSG)
 
-    override fun source(file: Path): Source =
-        tree.openReader(file)?.openStream()?.source()
-            ?: throw IOException("Can not open $file")
+    override fun source(file: Path): Source = tree.openReader(canonicalize(file))?.openStream()?.source()
+        ?: throw IOException("$file not found.")
 
-    private fun RevTree.walkTo(path: Path): TreeWalk? = if (path.isRoot)
-        TreeWalk(repository).apply { addTree(this@walkTo); isRecursive = false }
-    else
-        TreeWalk.forPath(
-            repository,
-            canonicalize(path).relativeTo(net.henryhc.redstone.git.GitTreeFileSystem.ROOT).toString(),
-            this@walkTo
-        )
-            ?.apply { isRecursive = false }
+    private fun treeWalkTo(path: Path): TreeWalk? = if (path.isRoot) TreeWalk(repository).apply { addTree(tree) }
+    else TreeWalk.forPath(repository, path.toString(), tree)
 
-    private fun RevTree.openReader(file: Path): ObjectLoader? =
-        TreeWalk.forPath(
-            repository,
-            canonicalize(file).relativeTo(net.henryhc.redstone.git.GitTreeFileSystem.ROOT).toString(),
-            this@openReader
-        )
-            .use { repository.open(it.getObjectId(0)) }
+    private fun RevTree.openReader(file: Path): ObjectLoader? = TreeWalk.forPath(
+        repository,
+        file.toString(),
+        this@openReader
+    )?.use { repository.open(it.getObjectId(0))!! }
 
-    private fun TreeWalk.descent() =
-        TreeWalk(repository).apply { addTree(this@descent.getObjectId(0)); isRecursive = false }
+    private fun TreeWalk.descent() = TreeWalk(repository).apply { addTree(this@descent.getObjectId(0)) }
 
     companion object {
         private const val READ_ONLY_MSG = "This file system is readonly."
