@@ -17,7 +17,7 @@ import org.eclipse.jgit.treewalk.TreeWalk
 class GitTreeFileSystem(
     private val repository: Repository,
     private val tree: RevTree
-) : FileSystem(), Closeable {
+) : FileSystem() {
 
     override fun appendingSink(file: Path, mustExist: Boolean): Sink = throw IOException(READ_ONLY_MSG)
 
@@ -75,9 +75,4 @@ class GitTreeFileSystem(
         private const val READ_ONLY_MSG = "This file system is readonly."
         private val ROOT = "/".toPath()
     }
-
-    override fun close() {
-        repository.close()
-    }
-
 }
