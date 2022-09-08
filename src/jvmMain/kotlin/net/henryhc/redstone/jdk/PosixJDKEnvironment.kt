@@ -82,9 +82,9 @@ class PosixJDKEnvironment(
         /**
          * The JAVA_HOME directory of the running JVM.
          */
-        val CURRENT_JAVA_HOME = System.getProperty("java.home").toPath()
+        val CURRENT_JAVA_HOME: Path = System.getProperty("java.home").toPath()
 
-        private const val CLASS_PATH_SEPARATOR: String = ";"
+        private const val CLASS_PATH_SEPARATOR: String = ":"
     }
 
 }
