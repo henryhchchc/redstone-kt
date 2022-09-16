@@ -1,14 +1,13 @@
 package net.henryhc.redstone.jdk
 
 /**
- * A context providing access to a [JDKEnvironment]
- * @see UnixJDKEnvironment
+ * A context providing access to a [JDK]
  */
 interface JDKContext {
 
     /**
-     * The [JDKEnvironment] in the current context.
+     * The [JDK] in the current context.
      */
-    val jdkEnvironment: JDKEnvironment
+    val jdk: JDK
 
 }

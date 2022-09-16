@@ -1,5 +1,8 @@
 package net.henryhc.redstone.jdk
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -8,11 +11,9 @@ import okio.Path
 import okio.Path.Companion.toPath
 
 /**
- * A JDK environment containing java executable and compiler.
+ * A JDK environment containing java executable and compiler in POSIX compatible operating systems.
  */
-class PosixJDKEnvironment(
-    override val javaHome: Path
-) : JDKEnvironment {
+class PosixJDK(override val javaHome: Path) : JDK {
 
     override val javaExecutable = javaHome / "bin" / "java"
 
@@ -29,7 +30,7 @@ class PosixJDKEnvironment(
         targetVersion: Int,
         suppressWarnings: Boolean,
         generateDebuggingInfo: Boolean,
-    ): JDKEnvironment.ExecutionResult {
+    ): Either<JDK.ExecutionResult, JDK.ExecutionResult> {
         val args = buildList {
             add(javaCompilerExecutable.toString())
             add("-classpath"); add(classPath.joinToString(CLASS_PATH_SEPARATOR))
@@ -42,15 +43,11 @@ class PosixJDKEnvironment(
             if (suppressWarnings) add("-nowarn")
             addAll(sourceFiles.map { it.toString() })
         }
-        val compilerProcess = withContext(Dispatchers.IO) {
-            ProcessBuilder().apply {
-                command(args)
-            }.start()
-        }
+        val compilerProcess = withContext(Dispatchers.IO) { ProcessBuilder().apply { command(args) }.start() }
         return pumpProcessOutput(compilerProcess)
     }
 
-    override suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path): JDKEnvironment.ExecutionResult {
+    override suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path): Either<JDK.ExecutionResult, JDK.ExecutionResult> {
         val args = buildList {
             add(javaExecutable.toString())
             addAll(arguments)
@@ -70,11 +67,9 @@ class PosixJDKEnvironment(
         val stdErrPump = async(Dispatchers.IO) { process.errorStream.readAllBytes() }
 
         val exitValue = withContext(Dispatchers.IO) { process.waitFor() }
-        JDKEnvironment.ExecutionResult(
-            exitValue,
-            stdOutPump.await().decodeToString(),
-            stdErrPump.await().decodeToString()
-        )
+        val result =
+            JDK.ExecutionResult(exitValue, stdOutPump.await().decodeToString(), stdErrPump.await().decodeToString())
+        if (exitValue == 0) result.right() else result.left()
     }
 
     companion object {

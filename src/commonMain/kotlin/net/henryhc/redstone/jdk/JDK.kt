@@ -1,11 +1,12 @@
 package net.henryhc.redstone.jdk
 
+import arrow.core.Either
 import okio.Path
 
 /**
  * An Java Development Kit environment for running Java process and Java compiler.
  */
-interface JDKEnvironment {
+interface JDK{
 
     /**
      * The path to JAVA_HOME
@@ -63,11 +64,11 @@ interface JDKEnvironment {
         targetVersion: Int = 11,
         suppressWarnings: Boolean = false,
         generateDebuggingInfo: Boolean = true,
-    ): ExecutionResult
+    ): Either<ExecutionResult, ExecutionResult>
 
     /**
      * Launch a Java process with specifies arguments.
      * @param arguments The arguments
      */
-    suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path): ExecutionResult
+    suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path): Either<ExecutionResult, ExecutionResult>
 }

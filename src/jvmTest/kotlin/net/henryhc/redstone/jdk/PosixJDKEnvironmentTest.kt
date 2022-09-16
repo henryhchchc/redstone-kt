@@ -7,6 +7,7 @@ import okio.FileSystem
 import okio.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class PosixJDKEnvironmentTest : FileSystemContext {
 
@@ -14,19 +15,19 @@ internal class PosixJDKEnvironmentTest : FileSystemContext {
 
     @Test
     fun testGetJavaExecutable() {
-        val jdkEnv = PosixJDKEnvironment(PosixJDKEnvironment.CURRENT_JAVA_HOME)
+        val jdkEnv = PosixJDK(PosixJDK.CURRENT_JAVA_HOME)
         assert(jdkEnv.javaExecutable.name == "java")
     }
 
     @Test
     fun testGetJavaCompileExecutable() {
-        val jdkEnv = PosixJDKEnvironment(PosixJDKEnvironment.CURRENT_JAVA_HOME)
+        val jdkEnv = PosixJDK(PosixJDK.CURRENT_JAVA_HOME)
         assert(jdkEnv.javaCompilerExecutable.name == "javac")
     }
 
     @Test
     fun testCompile(): Unit = runBlocking {
-        val jdkEnv = PosixJDKEnvironment(PosixJDKEnvironment.CURRENT_JAVA_HOME)
+        val jdkEnv = PosixJDK(PosixJDK.CURRENT_JAVA_HOME)
         TemporaryDirectory().use { tempDir ->
             createCompilationSubjects(tempDir)
             val result = jdkEnv.runJavaCompiler(
@@ -34,9 +35,12 @@ internal class PosixJDKEnvironmentTest : FileSystemContext {
                 listOf("Example.java", "C2.java").map { tempDir / "src" / "org" / "example" / it },
                 tempDir / "output"
             )
-            assertEquals(0, result.exitValue)
-            assert(fileSystem.exists(tempDir / "output" / "org" / "example" / "Example.class"))
-            assert(fileSystem.exists(tempDir / "output" / "org" / "example" / "C2.class"))
+            assertTrue { result.isRight() }
+            result.tap {
+                assertEquals(0, it.exitValue)
+                assert(fileSystem.exists(tempDir / "output" / "org" / "example" / "Example.class"))
+                assert(fileSystem.exists(tempDir / "output" / "org" / "example" / "C2.class"))
+            }
         }
     }
 
