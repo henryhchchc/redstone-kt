@@ -68,7 +68,8 @@ class PosixJDK(override val javaHome: Path) : JDK {
         timeout.tap {
             launch(Dispatchers.IO) {
                 delay(it)
-                Runtime.getRuntime().exec(arrayOf("kill", "-SIGTERM", process.pid().toString()))
+                if (process.isAlive)
+                    Runtime.getRuntime().exec(arrayOf("kill", "-SIGTERM", process.pid().toString())).waitFor()
             }
         }
 
