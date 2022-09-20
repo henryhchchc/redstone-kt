@@ -1,14 +1,10 @@
 package net.henryhc.redstone.jdk
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
+import arrow.core.*
+import kotlinx.coroutines.*
 import okio.Path
 import okio.Path.Companion.toPath
+import kotlin.time.Duration
 
 /**
  * A JDK environment containing java executable and compiler in POSIX compatible operating systems.
@@ -44,10 +40,14 @@ class PosixJDK(override val javaHome: Path) : JDK {
             addAll(sourceFiles.map { it.toString() })
         }
         val compilerProcess = withContext(Dispatchers.IO) { ProcessBuilder().apply { command(args) }.start() }
-        return pumpProcessOutput(compilerProcess)
+        return pumpProcessOutput(compilerProcess, none())
     }
 
-    override suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path): Either<JDK.ExecutionResult, JDK.ExecutionResult> {
+    override suspend fun runJavaProcess(
+        arguments: Iterable<String>,
+        workingDir: Path,
+        timeout: Option<Duration>
+    ): Either<JDK.ExecutionResult, JDK.ExecutionResult> {
         val args = buildList {
             add(javaExecutable.toString())
             addAll(arguments)
@@ -58,13 +58,19 @@ class PosixJDK(override val javaHome: Path) : JDK {
                 directory(workingDir.toFile())
             }.start()
         }
-        return pumpProcessOutput(javaProcess)
+        return pumpProcessOutput(javaProcess, timeout)
     }
 
-    private suspend fun pumpProcessOutput(process: Process) = coroutineScope {
+    private suspend fun pumpProcessOutput(process: Process, timeout: Option<Duration>) = coroutineScope {
         // Pull the output from the output streams so that the process will not get stuck.
         val stdOutPump = async(Dispatchers.IO) { process.inputStream.readAllBytes() }
         val stdErrPump = async(Dispatchers.IO) { process.errorStream.readAllBytes() }
+        timeout.tap {
+            launch(Dispatchers.IO) {
+                delay(it)
+                Runtime.getRuntime().exec(arrayOf("kill", "-SIGTERM", process.pid().toString()))
+            }
+        }
 
         val exitValue = withContext(Dispatchers.IO) { process.waitFor() }
         val result =

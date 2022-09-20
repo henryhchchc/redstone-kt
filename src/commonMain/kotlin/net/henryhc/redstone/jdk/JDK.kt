@@ -1,7 +1,10 @@
 package net.henryhc.redstone.jdk
 
 import arrow.core.Either
+import arrow.core.Option
+import arrow.core.none
 import okio.Path
+import kotlin.time.Duration
 
 /**
  * An Java Development Kit environment for running Java process and Java compiler.
@@ -70,5 +73,5 @@ interface JDK{
      * Launch a Java process with specifies arguments.
      * @param arguments The arguments
      */
-    suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path): Either<ExecutionResult, ExecutionResult>
+    suspend fun runJavaProcess(arguments: Iterable<String>, workingDir: Path, timeout: Option<Duration> = none()): Either<ExecutionResult, ExecutionResult>
 }
