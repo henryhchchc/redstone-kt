@@ -65,15 +65,18 @@ class PosixJDK(override val javaHome: Path) : JDK {
         // Pull the output from the output streams so that the process will not get stuck.
         val stdOutPump = async(Dispatchers.IO) { process.inputStream.readAllBytes() }
         val stdErrPump = async(Dispatchers.IO) { process.errorStream.readAllBytes() }
-        timeout.tap {
+        val killJob = timeout.map {
             launch(Dispatchers.IO) {
                 delay(it)
-                if (process.isAlive)
+                if (isActive && process.isAlive)
                     Runtime.getRuntime().exec(arrayOf("kill", "-SIGTERM", process.pid().toString())).waitFor()
             }
         }
 
-        val exitValue = withContext(Dispatchers.IO) { process.waitFor() }
+        val exitValue = withContext(Dispatchers.IO) {
+            process.waitFor().also { killJob.tap { it.cancel() } }
+        }
+
         val result =
             JDK.ExecutionResult(exitValue, stdOutPump.await().decodeToString(), stdErrPump.await().decodeToString())
         if (exitValue == 0) result.right() else result.left()
