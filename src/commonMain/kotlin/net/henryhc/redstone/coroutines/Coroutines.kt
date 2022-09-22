@@ -25,7 +25,7 @@ suspend inline fun <reified T, R> Iterable<T>.asyncMap(
 suspend inline fun <reified T, R> Iterable<T>.asyncMap(
     semaphore: Semaphore,
     context: CoroutineContext = EmptyCoroutineContext,
-    crossinline block: (T) -> R
+    crossinline block: suspend (T) -> R
 ) = coroutineScope { this@asyncMap.map { async(context) { semaphore.withPermit { block(it) } } }.awaitAll() }
 
 
