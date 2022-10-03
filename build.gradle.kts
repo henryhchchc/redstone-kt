@@ -2,8 +2,8 @@
 import java.net.URL
 
 plugins {
-    kotlin("multiplatform") version "1.7.20-RC"
-    kotlin("plugin.serialization") version "1.7.20-RC"
+    kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     id("org.jetbrains.dokka") version "1.7.10"
 }
 
