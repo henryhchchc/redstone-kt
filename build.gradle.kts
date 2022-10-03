@@ -73,7 +73,7 @@ kotlin {
                 implementation("io.arrow-kt:arrow-fx-stm:1.1.2")
                 implementation("com.github.ajalt.clikt:clikt:3.5.0")
                 implementation("com.squareup.okio:okio:3.2.0")
-                implementation("io.github.microutils:kotlin-logging:2.1.23")
+                implementation("io.github.microutils:kotlin-logging:3.0.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-okio:1.4.0")
             }
@@ -82,7 +82,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
-                implementation("io.mockk:mockk:1.12.7")
+                implementation("io.mockk:mockk:1.13.2")
             }
         }
         val jvmMain by getting {
