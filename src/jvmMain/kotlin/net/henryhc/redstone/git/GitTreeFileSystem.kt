@@ -23,7 +23,9 @@ class GitTreeFileSystem(
 
     override fun atomicMove(source: Path, target: Path): Unit = throw IOException(READ_ONLY_MSG)
 
-    override fun canonicalize(path: Path) = ROOT.resolve(path).relativeTo(ROOT)
+    override fun canonicalize(path: Path) = ROOT.resolve(path).run {
+        if (isRoot) this else relativeTo(ROOT)
+    }
 
     override fun createDirectory(dir: Path, mustCreate: Boolean): Unit = throw IOException(READ_ONLY_MSG)
 
