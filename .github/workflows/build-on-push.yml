@@ -12,7 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest,macos-latest ]
-        java-version: [ 11, 17, 19 ]
+#        java-version: [ 11, 17, 19 ]
+        java-version: [ 11, 17 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
