@@ -1,5 +1,7 @@
 package net.henryhc.redstone.reflection.jvm
 
+import io.kotest.assertions.arrow.core.shouldBeSome
+import io.kotest.matchers.collections.shouldHaveSize
 import net.henryhc.redstone.reflection.ReflectionScope
 import net.henryhc.redstone.reflection.elements.types.ObjectType
 import net.henryhc.redstone.reflection.elements.types.PrimitiveType
@@ -77,9 +79,7 @@ internal class ReflectionScopeExtensionsTest {
 
         assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ClassType
-        scope.getMethods((type))
-            .also { assertTrue { it.isDefined() } }
-            .tap { assertEquals(2, it.size) }
+        scope.getMethods((type)).shouldBeSome().shouldHaveSize(2)
     }
 
     @Test
@@ -90,9 +90,7 @@ internal class ReflectionScopeExtensionsTest {
 
         assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ClassType
-        scope.getFields(type)
-            .also { assertTrue { it.isDefined() } }
-            .tap { assertEquals(1, it.size) }
+        scope.getMethods((type)).shouldBeSome().shouldHaveSize(1)
     }
 
     @Test
@@ -103,9 +101,7 @@ internal class ReflectionScopeExtensionsTest {
 
         assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ClassType
-        scope.getConstructors(type)
-            .also { assertTrue { it.isDefined() } }
-            .tap { assertEquals(1, it.size) }
+        scope.getMethods((type)).shouldBeSome().shouldHaveSize(1)
     }
 
 }

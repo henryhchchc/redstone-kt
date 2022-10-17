@@ -1,5 +1,7 @@
 package net.henryhc.redstone.jdk
 
+import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.matchers.should
 import kotlinx.coroutines.runBlocking
 import net.henryhc.redstone.okio.FileSystemContext
 import net.henryhc.redstone.okio.TemporaryDirectory
@@ -7,7 +9,6 @@ import okio.FileSystem
 import okio.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 internal class PosixJDKEnvironmentTest : FileSystemContext {
 
@@ -35,8 +36,7 @@ internal class PosixJDKEnvironmentTest : FileSystemContext {
                 listOf("Example.java", "C2.java").map { tempDir / "src" / "org" / "example" / it },
                 tempDir / "output"
             )
-            assertTrue { result.isRight() }
-            result.tap {
+            result.shouldBeRight().should {
                 assertEquals(0, it.exitValue)
                 assert(fileSystem.exists(tempDir / "output" / "org" / "example" / "Example.class"))
                 assert(fileSystem.exists(tempDir / "output" / "org" / "example" / "C2.class"))

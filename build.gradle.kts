@@ -1,4 +1,5 @@
 @file:Suppress("UNUSED_VARIABLE")
+
 import java.net.URL
 
 plugins {
@@ -83,6 +84,8 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
                 implementation("io.mockk:mockk:1.13.2")
+                implementation("io.kotest:kotest-assertions-core:5.5.1")
+                implementation("io.kotest.extensions:kotest-assertions-arrow:1.2.5")
             }
         }
         val jvmMain by getting {
