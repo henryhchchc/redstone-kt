@@ -90,7 +90,7 @@ internal class ReflectionScopeExtensionsTest {
 
         assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ClassType
-        scope.getMethods((type)).shouldBeSome().shouldHaveSize(1)
+        scope.getFields(type).shouldBeSome().shouldHaveSize(1)
     }
 
     @Test
@@ -101,7 +101,7 @@ internal class ReflectionScopeExtensionsTest {
 
         assertTrue { jvmType.name in scope }
         val type = scope[jvmType.name] as ClassType
-        scope.getMethods((type)).shouldBeSome().shouldHaveSize(1)
+        scope.getConstructors(type).shouldBeSome().shouldHaveSize(1)
     }
 
 }
